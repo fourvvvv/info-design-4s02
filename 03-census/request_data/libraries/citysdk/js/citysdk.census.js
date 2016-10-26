@@ -137,7 +137,7 @@ CensusModule.prototype.aliases = {
     //Economic Variables
     "income": {
         "api": "acs",
-        "variable": "B19013_001E",
+        "variable": "B19301_001E",
         "description": "Median household income in the past 12 months (in 2013 inflation-adjusted dollars)"
     },
     "income_per_capita": {
