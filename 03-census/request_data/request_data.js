@@ -7,9 +7,7 @@ var variableCodeList = ['B01003_001E'  // population
                   ];
 var dataProcessedList = {};
 var ifInitStateList = false;
-// var dataProcessedList = {'B19301_001E': false
-//                        , 'B17001_002E': false
-//                        , 'B01003_001E': false};
+
 var stateList = {};
 var dataMin, dataMax;
 var dataMin1, dataMax1;
@@ -23,11 +21,20 @@ var barColorList = {'B01003_001E': '#ffffff'
 var textColor = '#a2e0fc';
 
 var foo = 0;
-var yOffset = -20;
+var bannerHeight = 40;
+// y of baseline - income above, poverty below
+var baselineY;
+var barWidth;
+var currentBarNum;
+var xOffset = 0;
+var numBarPerPage = 52;
+
 function setup() {
     createCanvas(960, 540);
-    // initializeCensus('');
-    initializeCensus('85a09c0ef73873b4519d0b403dbbb90c8dadea83');
+    initializeCensus('');
+    // initializeCensus('85a09c0ef73873b4519d0b403dbbb90c8dadea83');
+    baselineY = bannerHeight + (height - bannerHeight) / 3 * 2;
+    barWidth = width / numBarPerPage;
 
     for (var i in variableCodeList){
       var variableCode = variableCodeList[i];
@@ -45,7 +52,11 @@ function draw() {
       if(USDataIsReady(dataYear, 'B01003_001E')) {
         var USData = getUSData(dataYear, 'B01003_001E');
         for (var stateName in USData) {
-          stateList[stateName] = {};
+          stateList[stateName] = {name: stateName};
+          // stateList['key'] = function(n) {
+          //   return this[Object.keys(this)[n]];
+          // }
+
         }
         ifInitStateList = true;
       }
@@ -79,77 +90,23 @@ function draw() {
         }
       }
 
-      // once the data has been processed, draw the bar chart
+      // once the data has been processed
+      // start the TRUE DRAWING PROCESS
       else if (getMinInObj(dataProcessedList)) {
-        // for (var i in USDataList) {
-        //   var USData = USDataList[i];
-        //   var countyNames = Object.keys(USData);
+        numBarPerPage = Object.keys(stateList).length;
+        hoverBackgroud();
+        banner();
 
-        noStroke();
-        textAlign(LEFT, TOP);
-        var count = 0;
-        var len = Object.keys(stateList).length / 3;
+        // chart
+        chartFOO();
+        // baseline
+        stroke(255);
+        strokeWeight(2);
+        line(0, baselineY, width, baselineY);
+        strokeWeight(1);
 
-        for (var stateName in sortObjByFeature(stateList,'B19301_001E')) {
-          count += 1;
-          var barWidth = height/(len + 1)/2.5;
-          var y = map(count, 0, len, 10, height - 10) - yOffset;
+        hoverBox();
 
-          (count % 2) ? fill(255) : fill("#FFE33D");
-          textSize(15);
-          text(stateName, 5, y+2);
-
-          var poverty_percent = stateList[stateName]['B17001_002E']/stateList[stateName]['B01003_001E'];
-          var w = map(poverty_percent, 0, 0.5, 0, width/3-60);
-          fill(100);
-          rect(width/3-w, y, w, barWidth*2);
-          fill(255,200);
-          textAlign(RIGHT, TOP);
-          text(Number(poverty_percent*100).toFixed(1)+ "%", width/3-2, y);
-
-          textAlign(LEFT, TOP);
-          var y1 = map(count, 0, len, 10, height - 10) - yOffset;
-          var w1 = map(stateList[stateName]['B19301_001E'], 10000, 80000, 10, width/3*2-40);
-          var w2 = map(stateList[stateName]['B19013_001E'], 10000, 80000, 10, width/3*2-40);
-          // textSize(8);
-          fill(255, 227, 61, 220);
-          rect(width/3, y1, w1, barWidth);
-          text(stateList[stateName]['B19301_001E'], width/3+w1+10, y1);
-          fill(255,244,230, 230);
-          rect(width/3, y1+barWidth, w2, barWidth);
-          text(stateList[stateName]['B19013_001E'], width/3+w2+5, y1+barWidth);
-        }
-
-        fill(255);
-        stroke(backgroundColor);
-        rect(width/3-1.5, 0, 3, height);
-
-        fill(255, 80);
-        stroke(255, 227, 61);
-        rect(width*0.85, height*0.05, width*0.13, height*0.2);
-        fill(255);
-        noStroke();
-        textSize(15);
-        textAlign(CENTER, CENTER);
-        text("SORT BY", width*0.91, height*0.05 + 10);
-
-        fill(backgroundColor);
-        rect(0, 0, width, 45);
-
-        textAlign(CENTER, TOP);
-        fill(255);
-        textSize(20);
-        text("Rich v.s Poor", width/2, 2);
-
-        textSize(12);
-        textAlign(RIGHT, BOTTOM);
-        fill(200);
-        text("Below the poverty line", width/3-5, 40);
-        textAlign(LEFT, BOTTOM);
-        fill(255, 227, 61, 220);
-        text("Mean per person,", width/3+5, 40);
-        fill(255,244,230, 230);
-        text("Median household", width/3+100, 40);
       }
     }
 
@@ -164,21 +121,134 @@ function draw() {
 
 }
 
-function mouseWheel(event) {
-  print(event.delta);
-  //move the square according to the vertical scroll amount
-  console.log(yOffset);
-  if (yOffset > height + 550) {
-    yOffset = height + 550;
-  } else if (yOffset < -20) {
-    yOffset = -20;
+// draw background bar when mouseover
+function hoverBackgroud() {
+  // current #bar
+  if (Math.floor(mouseX/barWidth) < 0){
+    currentBarNum = 0;
+  } else if (Math.floor(mouseX/barWidth) >= numBarPerPage) {
+    currentBarNum = numBarPerPage - 1;
   } else {
-    yOffset += event.delta;
+    currentBarNum = Math.floor(mouseX/barWidth);
   }
-  //uncomment to block page scrolling
-  return false;
-  //uncomment to block page scrolling
-  //return false;
+  console.log(currentBarNum);
+  // x of current bar
+  var currentBarX = barWidth * currentBarNum;
+  // draw background bar
+  fill(20);
+  noStroke();
+  rect(currentBarX, bannerHeight, barWidth, height);
+
+  // call mouse event: press on a single bar
+  if (mouseIsPressed) {
+    mousePressedOnBar(currentBarNum);
+  }
+}
+
+function hoverBox() {
+  var boxWidth = 200;
+  var boxHeight = 70;
+  var boxX = mouseX + boxWidth < width ? mouseX : mouseX - boxWidth;
+  var boxY = mouseY + boxHeight < height ? mouseY : mouseY - boxHeight;
+  var item = getObjByIndex(stateList, currentBarNum);
+  var name = item['name'];
+  var poverty = item['B17001_002E'];
+  var income = item['B19301_001E']
+  var household = item['B19013_001E'];
+
+  fill(0, 200);
+  stroke(0);
+  rect(boxX, boxY, boxWidth, boxHeight);
+  textAlign(CENTER, CENTER);
+  fill(255);
+  textSize(14);
+  text(name, boxX+boxWidth/2, boxY+10);
+  textAlign(LEFT, CENTER)
+  textSize(12);
+  text("poverty: #" + nfc(poverty), boxX+10, boxY+30);
+  text("Income mean: $" + nfc(income), boxX+10, boxY+45);
+  text("Household median: $" + nfc(household), boxX+10, boxY+60);
+  textAlign(CENTER, CENTER);
+}
+
+// mouse event: press on a single bar
+function mousePressedOnBar(currentBarNum) {
+
+}
+
+// TODO: undecided func name
+function chartFOO() {
+  var count = 0;
+  for (var stateName in sortObjByFeature(stateList,'B19301_001E')) {
+    var barX = map(count, 0, numBarPerPage, 0, width) - xOffset;
+    var textX = barX + barWidth / 2;
+
+    // poverty level
+    var poverty_percent = stateList[stateName]['B17001_002E']/stateList[stateName]['B01003_001E'];
+    var povertyHeight = map(poverty_percent, 0, 0.5, 0, height/3-20);
+    fill(100);
+    rect(barX, baselineY, barWidth, povertyHeight);
+    fill(255,200);
+    textSize(10);
+    text(Number(poverty_percent*100).toFixed(0), textX, baselineY + 10);
+    text("%", textX, baselineY + 20);
+    textSize(12);
+
+    // income mean
+    var income = stateList[stateName]['B19301_001E']
+    var incomeHeight = map(income, 10000, 80000, 10, (height - bannerHeight)/3*2-20);
+    fill(255, 227, 61, 220);
+    rect(barX, baselineY-incomeHeight, barWidth/2, incomeHeight);
+
+    // household median
+    var household = stateList[stateName]['B19013_001E'];
+    var householdHeight = map(household, 10000, 80000, 10, (height - bannerHeight)/3*2-20);
+    fill(255,244,230, 230);
+    rect(barX+barWidth/2, baselineY-householdHeight, barWidth/2, householdHeight);
+
+    // state name
+    textSize(10);
+    if (abb[stateName]) {
+      text(abb[stateName], textX, baselineY-20);
+    } else {
+      text(stateName, textX, baselineY-20);
+    }
+    textSize(12);
+    count += 1;
+  }
+}
+
+
+
+function drawFilter() {
+  fill(255);
+  stroke(backgroundColor);
+  rect(width/3-1.5, 0, 3, height);
+
+  fill(255, 80);
+  stroke(255, 227, 61);
+  rect(width*0.85, height*0.05, width*0.13, height*0.2);
+  fill(255);
+  noStroke();
+  textSize(15);
+  textAlign(CENTER, CENTER);
+  text("SORT BY", width*0.91, height*0.05 + 10);
+}
+
+// Draw title banner
+function banner() {
+  noStroke();
+  fill(backgroundColor);
+  rect(0, 0, width, bannerHeight);
+
+  textAlign(CENTER, CENTER);
+  fill(255);
+  textSize(30);
+  text("RICH vs POOR", width/2, bannerHeight/2);
+  textSize(12);
+}
+
+function mousePressed() {
 }
 
 /************ helpers ************/
@@ -204,6 +274,7 @@ function getMaxInObj(obj) {
   return max;
 }
 
+// sort object by feature
 function sortObjByFeature(obj, feature) {
   var output = {};
   var key = Object.keys(obj)
@@ -213,14 +284,18 @@ function sortObjByFeature(obj, feature) {
   for (var i in key) {
     output[key[i]] = obj[key[i]];
   }
+  stateList = output;
   return output;
 }
 
-// // return sum of values in an object
-// function getSumInObj(obj) {
-//   var sum = 0;
-//   for (var k in obj) {
-//       sum += obj[k];
-//   }
-//   return sum;
-// }
+function getObjByIndex(obj, index) {
+  var count = 0;
+  for (var item in obj) {
+    if (index == count) {
+      return obj[item];
+    } else {
+      count += 1;
+    }
+  }
+
+}
