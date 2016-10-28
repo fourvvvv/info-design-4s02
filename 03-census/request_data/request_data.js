@@ -1,4 +1,3 @@
-var stateCode = 'WY';
 var dataYear = '2014';
 var variableCodeList = ['B01003_001E'  // population
                       , 'B19301_001E'  // income_per_capita
@@ -6,12 +5,13 @@ var variableCodeList = ['B01003_001E'  // population
                       , 'B17001_002E'  // poverty
                   ];
 var dataProcessedList = {};
+var CountyDataProcessedList = {};
 var ifInitStateList = false;
+var ifInitConutyList;
 
 var stateList = {};
-var dataMin, dataMax;
-var dataMin1, dataMax1;
-var dataMin2, dataMax2;
+var countyList = {};
+
 var backgroundColor = 38;
 var barColorList = {'B01003_001E': '#ffffff'
                   ,'B19301_001E': '#18759e'
@@ -25,14 +25,17 @@ var bannerHeight = 40;
 // y of baseline - income above, poverty below
 var baselineY;
 var barWidth;
-var currentBarNum;
+var currentBarNum = 0;
 var xOffset = 0;
 var numBarPerPage = 52;
+var stateCode = 0;
+var yOffset = -20;
+var ordering = 'B19301_001E';
 
 function setup() {
     createCanvas(960, 540);
-    initializeCensus('');
-    // initializeCensus('85a09c0ef73873b4519d0b403dbbb90c8dadea83');
+    // initializeCensus('');
+    initializeCensus('85a09c0ef73873b4519d0b403dbbb90c8dadea83');
     baselineY = bannerHeight + (height - bannerHeight) / 3 * 2;
     barWidth = width / numBarPerPage;
 
@@ -45,85 +48,107 @@ function setup() {
 
 
 function draw() {
-    background(backgroundColor);
-
-    if (!ifInitStateList) {
-      // stupid init of stateList!! TODO: change it
-      if(USDataIsReady(dataYear, 'B01003_001E')) {
-        var USData = getUSData(dataYear, 'B01003_001E');
-        for (var stateName in USData) {
-          stateList[stateName] = {name: stateName};
-          // stateList['key'] = function(n) {
-          //   return this[Object.keys(this)[n]];
-          // }
-
-        }
-        ifInitStateList = true;
+  if (!ifInitStateList) {
+    // stupid init of stateList!! TODO: change it
+    if(USDataIsReady(dataYear, 'B01003_001E')) {
+      var USData = getUSData(dataYear, 'B01003_001E');
+      for (var stateName in USData) {
+        stateList[stateName] = {name: stateName};
       }
-    } else {
-      // process the data (find min and max) once
-      if (!getMinInObj(dataProcessedList)) {
-        for (var i in variableCodeList) {
-          var variableCode = variableCodeList[i];
-          if(USDataIsReady(dataYear, variableCode)) {
-            var USData = getUSData(dataYear, variableCode);
-            for (var stateName in USData) {
-              stateList[stateName][variableCode] = USData[stateName];
-            }
-            // set min and max based on population
-            if (variableCode === 'B01003_001E') {
-              dataMin = getMinInObj(USData);
-              dataMax = getMaxInObj(USData);
-            }
-            // set min and max based on income_per_capita
-            if (variableCode === 'B19301_001E') {
-              dataMin1 = getMinInObj(USData);
-              dataMax1 = getMaxInObj(USData);
-            }
-            // set min and max based on Median_household_income
-            if (variableCode === 'B19013_001E') {
-              dataMin2 = getMinInObj(USData);
-              dataMax2 = getMaxInObj(USData);
-            }
-            dataProcessedList[variableCode] = true;
+      ifInitStateList = true;
+    }
+  } else {
+    // process the data (find min and max) once
+    if (!getMinInObj(dataProcessedList)) {
+      for (var i in variableCodeList) {
+        var variableCode = variableCodeList[i];
+        if(USDataIsReady(dataYear, variableCode)) {
+          var USData = getUSData(dataYear, variableCode);
+          for (var stateName in USData) {
+            stateList[stateName][variableCode] = USData[stateName];
           }
+          dataProcessedList[variableCode] = true;
         }
       }
-
-      // once the data has been processed
-      // start the TRUE DRAWING PROCESS
-      else if (getMinInObj(dataProcessedList)) {
-        numBarPerPage = Object.keys(stateList).length;
-        hoverBackgroud();
-        banner();
-
-        // chart
-        chartFOO();
-        // baseline
-        stroke(255);
-        strokeWeight(2);
-        line(0, baselineY, width, baselineY);
-        strokeWeight(1);
-
-        hoverBox();
-
-      }
     }
 
-    if (mouseIsPressed) {
-      if (mouseButton == LEFT) {
-        foo = 0;
-      }
-      if (mouseButton == RIGHT) {
-        foo = 1;
-      }
+    // once the data has been processed
+    // start the TRUE DRAWING PROCESS
+    else if (getMinInObj(dataProcessedList)) {
+
+      background(backgroundColor);
+      numBarPerPage = Object.keys(stateList).length;
+      backgroudLine();
+      hoverBackgroud();
+      banner();
+
+      // chart
+      chartFOO();
+      // baseline
+      stroke(255);
+      strokeWeight(2);
+      line(0, baselineY, width, baselineY);
+      strokeWeight(1);
+      // filter boxX
+      filterButtons();
+
+      // mouse hover
+      if (mouseY > bannerHeight) hoverBox();
+
     }
+  }
+
+}
+var codeToLabel = {'B01003_001E': 'Population'
+                  , 'B19301_001E': 'Income'
+                  , 'B19013_001E': 'Household'
+                  , 'B17001_002E': 'Poverty'
+                };
+function filterButtons() {
+  var myY = bannerHeight / 4;
+  var myX = barWidth;
+  var buttonWidth = 80;
+  var buttonHeight = bannerHeight / 2;
+  if (mouseY >= myY
+    && mouseY <= myY+ buttonHeight
+    && mouseX <= myX + (buttonWidth+5)*4
+    && mouseX >= myX
+    && mouseIsPressed
+  ){
+    ordering = variableCodeList[Math.floor( (mouseX-myX) / (buttonWidth + 5) )];
+    // console.log(orderingstateList);
+  }
+  for (var i in variableCodeList) {
+
+    if (variableCodeList[i] === ordering) {
+      fill(243, 134, 48, 200);
+    } else {
+      fill(255, 50);
+    }
+    stroke(0, 200);
+    strokeWeight(0.5);
+    rect(myX + (buttonWidth+5) * i, myY, buttonWidth, buttonHeight);
+
+    noStroke();
+    textAlign(CENTER, CENTER);
+    fill(255);
+    text(codeToLabel[variableCodeList[i]], myX + (buttonWidth+5) * i + buttonWidth / 2, buttonHeight);
+  }
+}
+
+function backgroudLine() {
+  for (var i = 0; i < numBarPerPage; i++) {
+    noFill();
+    stroke(255, 30);
+    strokeWeight(0.5);
+    rect(barWidth * i, bannerHeight, barWidth, height);
+  }
 
 }
 
 // draw background bar when mouseover
 function hoverBackgroud() {
-  // current #bar
+  // assign current #bar
   if (Math.floor(mouseX/barWidth) < 0){
     currentBarNum = 0;
   } else if (Math.floor(mouseX/barWidth) >= numBarPerPage) {
@@ -131,18 +156,15 @@ function hoverBackgroud() {
   } else {
     currentBarNum = Math.floor(mouseX/barWidth);
   }
-  console.log(currentBarNum);
+
   // x of current bar
   var currentBarX = barWidth * currentBarNum;
+
   // draw background bar
   fill(20);
   noStroke();
   rect(currentBarX, bannerHeight, barWidth, height);
 
-  // call mouse event: press on a single bar
-  if (mouseIsPressed) {
-    mousePressedOnBar(currentBarNum);
-  }
 }
 
 function hoverBox() {
@@ -171,15 +193,11 @@ function hoverBox() {
   textAlign(CENTER, CENTER);
 }
 
-// mouse event: press on a single bar
-function mousePressedOnBar(currentBarNum) {
-
-}
 
 // TODO: undecided func name
 function chartFOO() {
   var count = 0;
-  for (var stateName in sortObjByFeature(stateList,'B19301_001E')) {
+  for (var stateName in sortObjByFeature(stateList, ordering)) {
     var barX = map(count, 0, numBarPerPage, 0, width) - xOffset;
     var textX = barX + barWidth / 2;
 
@@ -208,10 +226,11 @@ function chartFOO() {
 
     // state name
     textSize(10);
+    fill(255, 180);
     if (abb[stateName]) {
-      text(abb[stateName], textX, baselineY-20);
+      text(abb[stateName], textX, bannerHeight+10);
     } else {
-      text(stateName, textX, baselineY-20);
+      text(stateName, textX, bannerHeight+10);
     }
     textSize(12);
     count += 1;
@@ -219,27 +238,12 @@ function chartFOO() {
 }
 
 
-
-function drawFilter() {
-  fill(255);
-  stroke(backgroundColor);
-  rect(width/3-1.5, 0, 3, height);
-
-  fill(255, 80);
-  stroke(255, 227, 61);
-  rect(width*0.85, height*0.05, width*0.13, height*0.2);
-  fill(255);
-  noStroke();
-  textSize(15);
-  textAlign(CENTER, CENTER);
-  text("SORT BY", width*0.91, height*0.05 + 10);
-}
-
 // Draw title banner
 function banner() {
-  noStroke();
-  fill(backgroundColor);
+  stroke(0);
+  fill(backgroundColor-10);
   rect(0, 0, width, bannerHeight);
+  noStroke();
 
   textAlign(CENTER, CENTER);
   fill(255);
@@ -248,7 +252,26 @@ function banner() {
   textSize(12);
 }
 
-function mousePressed() {
+function keyPressed() {
+  if (keyCode === ESCAPE) {
+    stateCode = 0;
+  }
+}
+
+function mouseWheel(event) {
+  print(event.delta);
+  //move the square according to the vertical scroll amount
+  if (yOffset > height + 550) {
+    yOffset = height + 550;
+  } else if (yOffset < -20) {
+    yOffset = -20;
+  } else {
+    yOffset += event.delta;
+  }
+  //uncomment to block page scrolling
+  return false;
+  //uncomment to block page scrolling
+  //return false;
 }
 
 /************ helpers ************/
