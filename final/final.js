@@ -1,12 +1,17 @@
 /*****
 TODO:
 1) arrow
-DONE 2) lesser houses emerge after they first involved
+3) Bolton betrayed
+4) crawler: get icon image for each house
+5) time slider not equally divided
+6) change stupid drawing box -> put them into an array?
+7) major_death & major_capture
+
+DONE
+2) lesser houses emerge after they first involved
   - if house involved a battle, set "involved" as 1
   - only display house whose "involved" == 1
   - houses' #battle -> color
-3) Bolton betrayed
-4) get icon image for each house
 *****/
 
 /***
@@ -19,6 +24,10 @@ var if_data_print = 0;
 var slider;
 var data;
 var img = [];
+var circleCenterX, circleCenterY, circleR
+  , sliderStartX, sliderY, sliderWidth
+  , titleX, titleY;
+var leftBox1, leftBox2;
 
 function preload() {
   for (var i = 0; i < houses.length; i++) {
@@ -28,15 +37,43 @@ function preload() {
 
 function setup() {
   data = loadTable("data/battles.csv", "csv", "header");
-  createCanvas(windowWidth, windowHeight);
+  createCanvas(displayWidth, windowHeight);
+
+  // init variables about sizes
+  circleCenterX = width*0.5;
+  circleCenterY = height*0.5;
+  circleR = height*0.2;
+  sliderWidth = width*0.6;
+  sliderStartX = (width - sliderWidth)/2;
+  sliderY = height*0.9;
+  titleX = width*0.5;
+  titleY = height*0.1;
+  // TODO: elegant this
+  leftBox1 = initBox("Battle Type"
+                    , width*0.2, height*0.05, width*0.05, height*0.15
+                    , ["battle_type"]
+                    , 0);
+  leftBox2 = initBox("Attackers vs Defenders"
+                    , width*0.2, height*0.05, width*0.05, height*0.25
+                    , ["attacker_king", "defender_king"
+                      ,	"attacker_1",	"attacker_2",	"attacker_3",	"attacker_4"
+                      ,	"defender_1",	"defender_2",	"defender_3",	"defender_4"]
+                    , 7);
+  leftBox3 = initBox("Houses involved in battles"
+                    , width*0.2, height*0.05, width*0.05, height*0.65
+                    , ["house"]
+                    , 7);
+  rightBox1 = initBox("Major Death"
+                    , width*0.2, height*0.05, width*0.75, height*0.25
+                    , ["major_death"]);
+  rightBox2 = initBox("Major Capture"
+                    , width*0.2, height*0.05, width*0.75, height*0.65
+                    , ["major_capture"]);
 
   slider = createSlider(1, 38, 1, 1);
-  slider.position(windowWidth/10, windowHeight*0.9);
-  slider.style("width", windowWidth/2 + "px");
+  slider.position(sliderStartX, sliderY);
+  slider.style("width", sliderWidth + "px");
 
-  var circleCenterX = windowWidth*0.35;
-  var circleCenterY = windowHeight*0.5;
-  var circleR = windowHeight/5;
   // setup circles' positions
   for (var i = 0; i < houses.length; i++) {
     if (houses[i]['great']) {
@@ -52,17 +89,14 @@ function setup() {
 
 function draw() {
   background(51);
-  // only run once
-  if (data.getRowCount() && !if_data_print) {
-    console.log(data);
 
-    // for (var i = 0; i < data.getRowCount(); i++) {
-    //   console.log(data.getColumn("name")[i]);
-    // }
-
-    if_data_print = 1;
-  }
-
+  // FOR TESTING - only run once
+  // if (data.getRowCount() && !if_data_print) {
+  //   console.log(data);
+  //   // for (var i = 0; i < data.getRowCount(); i++) {
+  //   //   console.log(data.getColumn("name")[i]);
+  //   // }
+  //   if_data_print = 1;
 
   // draw title
   drawTitle();
@@ -72,131 +106,18 @@ function draw() {
 
   // fill involoved
   if (data.getRowCount()) fillInvoloved(slider.value() - 1)
+
   // draw info
-  textAlign(LEFT);
-  textSize(15);
-  drawInfo(slider.value() - 1);
+  // drawInfo(slider.value() - 1);
 
   // draw circle
   if (data.getRowCount()) drawCircle(slider.value()-1);
 
+  // draw boxes
+  drawBox(leftBox1);
+  drawBox(leftBox2);
+  drawBox(leftBox3);
+  drawBox(rightBox1);
+  drawBox(rightBox2);
 
-}
-
-function drawTitle() {
-  textAlign(CENTER);
-  textSize(20);
-  fill(255);
-  text("Battles in Game of Thromes", width/2, height/10);
-}
-
-function drawTimeSlider() {
-  // TODO: change style to flat
-  // slider.style("background-color", "#ff0000");
-}
-
-function drawInfo(index) {
-  for (var i = 0; i < data.getColumnCount(); i++) {
-    var key = data.columns[i];
-    var value = data.getColumn(key)[index];
-    text(key + ":", width/3*2, height/10*2 + 20*i);
-    text(value + "", width/9*7.5, height/10*2 + 20*i);
-  }
-}
-
-function drawCircle(index) {
-  // draw all houses
-  for (var i = 0; i < houses.length; i++) {
-    // if (houses[i]["great"] || houses[i]["involved"]) {
-    //   console.log(i);
-    //   fill(100 + houses[i]["involved"]/34 * 400);
-    // }
-    textAlign(CENTER, CENTER);
-    if (houses[i]["img"]) {
-      fill(100 + houses[i]["involved"]/34 * 400);
-      // ellipse(houses[i]['x'], houses[i]['y'], 80);
-      image(houses[i]["img"], houses[i]['x']-40, houses[i]['y']-40, 80, 80);
-      // fill(255);
-      text(houses[i]['name'], houses[i]['x'], houses[i]['y']+40);
-    } else {
-      noFill();
-      if (houses[i]["involved"]) {
-        stroke(100 + houses[i]["involved"]/34 * 400);
-      }
-      ellipse(houses[i]['x'], houses[i]['y'], 40);
-      if (houses[i]["involved"]) {
-        fill(100 + houses[i]["involved"]/34 * 400);
-      }
-      textSize(10);
-      noStroke();
-      text(houses[i]['name'], houses[i]['x'], houses[i]['y']);
-    }
-  }
-
-  // identify who's involved in the battle
-  var housesInBattle = getHousesInBattle(index);
-  var attackers = housesInBattle["attackers"];
-  var defenders = housesInBattle["defenders"];
-
-  // draw arrows
-  stroke(255);
-  strokeWeight(2);
-  for (var i = 0; i < attackers.length; i++) {
-      for (var j = 0; j < defenders.length; j++) {
-        var att = findItemByValue(houses, 'name', attackers[i]);
-        var def = findItemByValue(houses, 'name', defenders[j]);
-        if (att && def) line(att['x'], att['y'], def['x'], def['y']);
-      }
-  }
-  noStroke();
-  strokeWeight(1);
-}
-
-// helpers
-// TODO: change this stupid search...
-function findItemByValue(json, col, value) {
-  return json.filter(
-        function(json){ return json[col] == value }
-    )[0];
-}
-
-function fillInvoloved(index) {
-  for (var i = 0; i < houses.length; i++) {
-    houses[i]["involved"] = 0;
-  }
-
-  for (var i = 0; i <= index; i++) {
-    var housesInBattle = getHousesInBattle(i);
-    var attackers = housesInBattle["attackers"];
-    var defenders = housesInBattle["defenders"];
-    for (var j = 0; j < attackers.length; j++) {
-      if (findItemByValue(houses, "name", attackers[j])["involved"]) {
-        findItemByValue(houses, "name", attackers[j])["involved"] += 1;
-      } else {
-        findItemByValue(houses, "name", attackers[j])["involved"] = 1;
-      }
-    }
-    for (var j = 0; j < defenders.length; j++) {
-      if (findItemByValue(houses, "name", defenders[j])["involved"]) {
-        findItemByValue(houses, "name", defenders[j])["involved"] += 1;
-      } else {
-        findItemByValue(houses, "name", defenders[j])["involved"] = 1;
-      }
-    }
-  }
-}
-
-function getHousesInBattle(index) {
-  var attackers = [];
-  var defenders = [];
-  for (var i = 5; i < 9; i++) {
-    var houseName = data.getString(index, i);
-    if (houseName) attackers.push(houseName);
-  }
-  for (var i = 9; i < 13; i++) {
-    var houseName = data.getString(index, i);
-    if (houseName) defenders.push(houseName);
-  }
-  return {"attackers": attackers
-          ,"defenders": defenders}
 }

@@ -10013,13 +10013,13 @@ p5.prototype.displayHeight = screen.height;
  * System variable that stores the width of the inner window, it maps to
  * window.innerWidth.
  *
- * @property windowWidth
+ * @property displayWidth
  * @example
  * <div class="norender"><code>
- * createCanvas(windowWidth, windowHeight);
+ * createCanvas(displayWidth, windowHeight);
  * </code></div>
  */
-p5.prototype.windowWidth = document.documentElement.clientWidth;
+p5.prototype.displayWidth = document.documentElement.clientWidth;
 /**
  * System variable that stores the height of the inner window, it maps to
  * window.innerHeight.
@@ -10027,7 +10027,7 @@ p5.prototype.windowWidth = document.documentElement.clientWidth;
  * @property windowHeight
  * @example
  * <div class="norender"><code>
- * createCanvas(windowWidth, windowHeight);
+ * createCanvas(displayWidth, windowHeight);
  * </code></div>
  */
 p5.prototype.windowHeight = document.documentElement.clientHeight;
@@ -10041,7 +10041,7 @@ p5.prototype.windowHeight = document.documentElement.clientHeight;
  * @example
  * <div class="norender"><code>
  * function setup() {
- *   createCanvas(windowWidth, windowHeight);
+ *   createCanvas(displayWidth, windowHeight);
  * }
  *
  * function draw() {
@@ -10049,12 +10049,12 @@ p5.prototype.windowHeight = document.documentElement.clientHeight;
  * }
  *
  * function windowResized() {
- *   resizeCanvas(windowWidth, windowHeight);
+ *   resizeCanvas(displayWidth, windowHeight);
  * }
  * </code></div>
  */
 p5.prototype._onresize = function(e){
-  this._setProperty('windowWidth', window.innerWidth);
+  this._setProperty('displayWidth', window.innerWidth);
   this._setProperty('windowHeight', window.innerHeight);
   var context = this._isGlobal ? window : this;
   var executeDefault;
@@ -13200,7 +13200,7 @@ p5.prototype.createCanvas = function(w, h, renderer) {
  * @example
  * <div class="norender"><code>
  * function setup() {
- *   createCanvas(windowWidth, windowHeight);
+ *   createCanvas(displayWidth, windowHeight);
  * }
  *
  * function draw() {
@@ -13208,7 +13208,7 @@ p5.prototype.createCanvas = function(w, h, renderer) {
  * }
  *
  * function windowResized() {
- *   resizeCanvas(windowWidth, windowHeight);
+ *   resizeCanvas(displayWidth, windowHeight);
  * }
  * </code></div>
  */
@@ -15842,7 +15842,7 @@ p5.prototype.winMouseX = 0;
  *
  *   //move the canvas to the vertical mouse position
  *   //relative to the window
- *   myCanvas.position(windowWidth/2, winMouseY+1);
+ *   myCanvas.position(displayWidth/2, winMouseY+1);
  *
  *  //the x of the square is relative to the canvas
  *  rect(mouseX,20,60,60);
