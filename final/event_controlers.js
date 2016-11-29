@@ -1,4 +1,6 @@
 // This file contains all functions related to event controlers.
+
+// built-in mousePressed event controler
 function mousePressed() {
   clickBox(leftBox2);
   clickBox(leftBox3);
@@ -19,6 +21,8 @@ function clickBox(box) {
   }
 }
 
+
+// return true id mouse is inside the box
 function isInsideBox(box) {
   return mouseX >= box.left
       && mouseX <= box.right

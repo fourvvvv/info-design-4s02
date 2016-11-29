@@ -1,5 +1,6 @@
 // helpers
-function initBox(title, w, h, left, top, feature, expand = 4) {
+function initBox(title, w, h, left, top, feature, expand) {
+  if (!expand) expand = 4;
   var box = {title: title
            , width: w, height: h
            , left: left, top: top

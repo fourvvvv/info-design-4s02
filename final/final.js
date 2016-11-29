@@ -2,16 +2,24 @@
 TODO:
 1) arrow
 3) Bolton betrayed
-4) crawler: get icon image for each house
 5) time slider not equally divided
 6) change stupid drawing box -> put them into an array?
-7) major_death & major_capture
+7) ?? major_death & major_capture
+8) move house icons all the time.
+    Distance bewteen each other could be based on relationship (distant / close)
+10) image
+  - get rid of errors
+  - size correctly
+11) format text size/align
+
 
 DONE
 2) lesser houses emerge after they first involved
   - if house involved a battle, set "involved" as 1
   - only display house whose "involved" == 1
   - houses' #battle -> color
+4) crawler: get icon image for each house
+9) hover box to explain info
 *****/
 
 /***
@@ -30,9 +38,17 @@ var circleCenterX, circleCenterY, circleR
 var leftBox1, leftBox2;
 
 function preload() {
-  for (var i = 0; i < houses.length; i++) {
-    if (houses[i]["great"]) houses[i]["img"] = loadImage("img/" + houses[i]["name"] +".png");
-  }
+  houses.forEach(function(entry){
+    var path = "img/house/" + entry["name"] +".png";
+
+    $.get(path)
+    .done(function() {
+      entry["img"] = loadImage(path);
+      // var thisSound = loadSound(path, storeSound);
+    }).fail(function() {
+      // do something with the error
+    });
+  });
 }
 
 function setup() {
@@ -52,7 +68,7 @@ function setup() {
   leftBox1 = initBox("Battle Type"
                     , width*0.2, height*0.05, width*0.05, height*0.15
                     , ["battle_type"]
-                    , 0);
+                    , -1);
   leftBox2 = initBox("Attackers vs Defenders"
                     , width*0.2, height*0.05, width*0.05, height*0.25
                     , ["attacker_king", "defender_king"
@@ -89,6 +105,10 @@ function setup() {
 
 function draw() {
   background(51);
+
+  // for (var i=0, L = houseList.length;i<L;i++){
+  //   houseList[i].update();
+  // }
 
   // FOR TESTING - only run once
   // if (data.getRowCount() && !if_data_print) {

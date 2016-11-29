@@ -1,5 +1,19 @@
 // This file contains all functions drawing components
 
+// called by "drawBox"
+function drawHoverBox(content, w, h, x, y) {
+  this.width = w;
+  this.height = h/2;
+  this.x = x + this.width/2;
+  this.y = y + this.height/2;
+  fill(0, 50);
+  rect(x, y, this.width, this.height);
+  textAlign(CENTER, CENTER);
+  // textSize(20);
+  fill(255);
+  text(content, this.x, this.y);
+}
+
 function drawTitle() {
   textAlign(CENTER);
   textSize(20);
@@ -37,11 +51,13 @@ function drawCircle(index) {
     // }
     textAlign(CENTER, CENTER);
     if (houses[i]["img"]) {
-      fill(100 + houses[i]["involved"]/34 * 400);
-      // ellipse(houses[i]['x'], houses[i]['y'], 80);
-      image(houses[i]["img"], houses[i]['x']-40, houses[i]['y']-40, 80, 80);
-      // fill(255);
-      text(houses[i]['name'], houses[i]['x'], houses[i]['y']+40);
+      if (houses[i]["great"]||houses[i]["involved"]) {
+        fill(100 + houses[i]["involved"]/34 * 400);
+        // ellipse(houses[i]['x'], houses[i]['y'], 80);
+        image(houses[i]["img"], houses[i]['x']-40, houses[i]['y']-40, 80, 80);
+        // fill(255);
+        text(houses[i]['name'], houses[i]['x'], houses[i]['y']+40);
+      }
     } else {
       noFill();
       if (houses[i]["involved"]) {
@@ -108,5 +124,8 @@ function drawBox(box) {
       text(info, box.left+5, box.top+30);
     }
   }
-
+  // hover: display details
+  if (isInsideBox(box)) {
+    drawHoverBox(box.title, box.width, box.height, mouseX, mouseY);
+  }
 }
