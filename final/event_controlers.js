@@ -2,10 +2,9 @@
 
 // built-in mousePressed event controler
 function mousePressed() {
-  clickBox(leftBox2);
-  clickBox(leftBox3);
-  clickBox(rightBox1);
-  clickBox(rightBox2);
+  boxList.forEach(function(box) {
+    clickBox(box);
+  });
 }
 
 // clickable box: click -> change height (display details)

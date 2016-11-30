@@ -2,8 +2,8 @@
 
 // called by "drawBox"
 function drawHoverBox(content, w, h, x, y) {
-  this.width = w;
-  this.height = h/2;
+  this.width = 200;
+  this.height = 20;
   this.x = x + this.width/2;
   this.y = y + this.height/2;
   fill(0, 50);
@@ -15,7 +15,7 @@ function drawHoverBox(content, w, h, x, y) {
 }
 
 function drawTitle() {
-  textAlign(CENTER);
+  textAlign(CENTER, CENTER);
   textSize(20);
   fill(255);
   text("Battles in Game of Thromes", titleX, titleY);
@@ -44,47 +44,37 @@ function drawCircle(index) {
   textSize(15);
   noStroke();
   // draw all houses
-  for (var i = 0; i < houses.length; i++) {
-    // if (houses[i]["great"] || houses[i]["involved"]) {
-    //   console.log(i);
-    //   fill(100 + houses[i]["involved"]/34 * 400);
-    // }
+  houseList.forEach(function(house, i) {
     textAlign(CENTER, CENTER);
-    if (houses[i]["img"]) {
-      if (houses[i]["great"]||houses[i]["involved"]) {
-        fill(100 + houses[i]["involved"]/34 * 400);
-        // ellipse(houses[i]['x'], houses[i]['y'], 80);
-        image(houses[i]["img"], houses[i]['x']-40, houses[i]['y']-40, 80, 80);
-        // fill(255);
-        text(houses[i]['name'], houses[i]['x'], houses[i]['y']+40);
+    if (house["img"]) {
+      if (house["great"] || house["involved"]) {
+        fill(100 + house["involved"]/34 * 400);
+        image(house["img"], house['x']-40, house['y']-40, 80, 80);
+        text(house['name'], house['x'], house['y']+40);
       }
     } else {
       noFill();
-      if (houses[i]["involved"]) {
-        stroke(100 + houses[i]["involved"]/34 * 400);
-      }
-      ellipse(houses[i]['x'], houses[i]['y'], 40);
-      if (houses[i]["involved"]) {
-        fill(100 + houses[i]["involved"]/34 * 400);
-      }
+      if (house["involved"]) stroke(100 + houses[i]["involved"]/34 * 400);
+      ellipse(house['x'], house['y'], 40);
+      if (house["involved"]) fill(100 + house["involved"]/34 * 400);
       textSize(10);
       noStroke();
-      text(houses[i]['name'], houses[i]['x'], houses[i]['y']);
+      text(house['name'], house['x'], house['y']);
     }
-  }
+  });
 
   // identify who's involved in the battle
   var housesInBattle = getHousesInBattle(index);
   var attackers = housesInBattle["attackers"];
   var defenders = housesInBattle["defenders"];
 
-  // draw arrows
+  // draw line (and arrows)
   stroke(255);
   strokeWeight(2);
   for (var i = 0; i < attackers.length; i++) {
       for (var j = 0; j < defenders.length; j++) {
-        var att = findItemByValue(houses, 'name', attackers[i]);
-        var def = findItemByValue(houses, 'name', defenders[j]);
+        var att = findItemByValue(houseList, 'name', attackers[i]);
+        var def = findItemByValue(houseList, 'name', defenders[j]);
         if (att && def) line(att['x'], att['y'], def['x'], def['y']);
       }
   }
@@ -113,9 +103,9 @@ function drawBox(box) {
       // console.log(data.getColumn(box.feature));
       var info = "";
       if (box.feature[0] == "house") {
-        for (var i = 0; i < houses.length; i++) {
-          if (houses[i]["involved"]) info += houses[i]["name"] + ": " + houses[i]["involved"] + "\n";
-        }
+        houseList.forEach(function(house) {
+          if (house.involved) info += house.name + ": " + house.involved + "\n";
+        });
       } else {
         for (var i = 0; i < box.feature.length; i++) {
           info += data.getColumn(box.feature[i])[slider.value() - 1] + "\n";

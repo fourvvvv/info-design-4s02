@@ -1,18 +1,4 @@
 // helpers
-function initBox(title, w, h, left, top, feature, expand) {
-  if (!expand) expand = 4;
-  var box = {title: title
-           , width: w, height: h
-           , left: left, top: top
-           , feature: feature
-           , expand: expand
-           , clickable: expand ? 1 : 0
-           , open: 0
-           };
-  box.right = box.left + box.width;
-  box.bottom = box.top + box.height;
-  return box
-}
 
 // TODO: change this stupid search...
 function findItemByValue(json, col, value) {
@@ -22,26 +8,26 @@ function findItemByValue(json, col, value) {
 }
 
 function fillInvoloved(index) {
-  for (var i = 0; i < houses.length; i++) {
-    houses[i]["involved"] = 0;
-  }
+  houseList.forEach(function(entry) {
+    entry.setInvolved(0);
+  });
 
   for (var i = 0; i <= index; i++) {
     var housesInBattle = getHousesInBattle(i);
     var attackers = housesInBattle["attackers"];
     var defenders = housesInBattle["defenders"];
     for (var j = 0; j < attackers.length; j++) {
-      if (findItemByValue(houses, "name", attackers[j])["involved"]) {
-        findItemByValue(houses, "name", attackers[j])["involved"] += 1;
+      if (findItemByValue(houseList, "name", attackers[j])["involved"]) {
+        findItemByValue(houseList, "name", attackers[j])["involved"] += 1;
       } else {
-        findItemByValue(houses, "name", attackers[j])["involved"] = 1;
+        findItemByValue(houseList, "name", attackers[j])["involved"] = 1;
       }
     }
     for (var j = 0; j < defenders.length; j++) {
-      if (findItemByValue(houses, "name", defenders[j])["involved"]) {
-        findItemByValue(houses, "name", defenders[j])["involved"] += 1;
+      if (findItemByValue(houseList, "name", defenders[j])["involved"]) {
+        findItemByValue(houseList, "name", defenders[j])["involved"] += 1;
       } else {
-        findItemByValue(houses, "name", defenders[j])["involved"] = 1;
+        findItemByValue(houseList, "name", defenders[j])["involved"] = 1;
       }
     }
   }

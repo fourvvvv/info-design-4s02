@@ -1,3 +1,7 @@
+/* run
+ > node ima_spider.js
+ crawl image of houses to local space
+*/
 var fs = require('fs')
   , request = require('request')
   , cheerio = require('cheerio');
@@ -5,7 +9,7 @@ var fs = require('fs')
 // load URL
 var $ = cheerio.load('http://gameofthrones.wikia.com/wiki/Game_of_Thrones_Wiki');
 
-// House icon spider
+// house icon spider
 request('http://gameofthrones.wikia.com/wiki/Game_of_Thrones_Wiki', function (error, response, html) {
   if (!error && response.statusCode == 200) {
     var $ = cheerio.load(html);
