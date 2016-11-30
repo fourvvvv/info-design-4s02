@@ -17,19 +17,26 @@ House.prototype.setInvolved = function(i) {
   this.involved = i;
 }
 
+// House.prototype.setCurrentInBattle = function(side) {
+//   // side = 1 -> attacker, -1 -> defender
+//   this.currentInBattle = side;
+// }
+
 House.prototype.getIsGreat = function() {
   return this.isGreat;
 }
-// House.prototype.moveto = function(x, y){
-//   this.targetX = x;
-// }
-//
-// House.prototype.update = function(){
-//   var dx = this.targetX - this.x;
-//   if (dx) {
-//     this.x += dx * 0.05;
-//     if (Math.abs(dx) < 0.5) {
-//         this.x = this.targetX;
-//     }
-//   }
-// }
+
+House.prototype.moveto = function(x, y){
+  this.targetX = x;
+  this.targetY = y;
+}
+
+House.prototype.update = function(){
+  // var dx = this.targetX - this.x;
+  // if (dx) {
+  //   this.x += dx * 0.05;
+  //   if (Math.abs(dx) < 0.5) {
+  //       this.x = this.targetX;
+  //   }
+  // }
+}

@@ -48,16 +48,16 @@ function drawCircle(index) {
     textAlign(CENTER, CENTER);
     if (house["img"]) {
       if (house["great"] || house["involved"]) {
-        fill(100 + house["involved"]/34 * 400);
+        fill(100 - house["involved"]/34 * 150);
         image(house["img"], house['x']-40, house['y']-40, 80, 80);
-        text(house['name'], house['x'], house['y']+40);
+        text(house['name'], house['x'], house['y']+50);
       }
     } else {
       noFill();
       if (house["involved"]) stroke(100 + houses[i]["involved"]/34 * 400);
       ellipse(house['x'], house['y'], 40);
-      if (house["involved"]) fill(100 + house["involved"]/34 * 400);
-      textSize(10);
+      if (house["involved"]) fill(100 - house["involved"]/34 * 150);
+      // textSize(10);
       noStroke();
       text(house['name'], house['x'], house['y']);
     }
@@ -81,7 +81,7 @@ function drawCircle(index) {
   noStroke();
   strokeWeight(1);
 }
-
+var test = 0;
 function drawBox(box) {
   fill(255, 50);
   strokeWeight(1);

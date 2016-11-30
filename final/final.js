@@ -6,14 +6,12 @@ TODO:
 6) change stupid drawing box -> put them into an array?
 7) ?? major_death & major_capture
 8) move house icons all the time
-  - move who's involved to the screen center, and move others to corner (and opacity)
-  - ? Distance bewteen each other could be based on relationship (distant / close)
+  - matrix, house m vs house n
+  - Distance bewteen each other could be based on relationship (distant / close)
 10) image
   - get rid of errors
   - size correctly
-11) format text size/align
-12) change to Class
-
+13) ??? whether use "currentInBattle"
 
 DONE
 2) lesser houses emerge after they first involved
@@ -23,7 +21,12 @@ DONE
 4) crawler: get icon image for each house
 8) move house icons all the time
   - at first, all Greater houses are shown in a row
+  - move who's involved to the screen center, and move others to corner (and opacity)
+
 9) hover box to explain info
+11) format text size/align
+12) change to Class
+
 *****/
 
 /***
@@ -41,6 +44,7 @@ var circleCenterX, circleCenterY, circleR
   , titleX, titleY;
 var boxList = [];
 var houseList = [];
+var time = 0;
 
 function preload() {
 
@@ -51,13 +55,13 @@ function preload() {
 
     var img;
     var path = "img/house/" + entry["name"] +".png";
-    // $.get(path)
-    // .done(function() {
-    //   item.setImage(loadImage(path));
-    //   // var thisSound = loadSound(path, storeSound);
-    // }).fail(function() {
-    //   // do something with the error
-    // });
+    $.get(path)
+    .done(function() {
+      item.setImage(loadImage(path));
+      // var thisSound = loadSound(path, storeSound);
+    }).fail(function() {
+      // do something with the error
+    });
     houseList.push(item);
   });
 }
@@ -109,7 +113,18 @@ function setup() {
 }
 
 function draw() {
+  if (slider.value() - 1 !== time) {
+    time = slider.value() - 1;
+    sliderChanged();
+  }
+
   background(51);
+
+  fill(238, 162, 173);
+  rect(0, 0, width/2, height);
+
+  fill(121, 129, 116);
+  rect(width/2, 0, width/2, height);
 
   // draw title
   drawTitle();
@@ -118,7 +133,7 @@ function draw() {
   drawTimeSlider();
 
   // fill involoved
-  if (data.getRowCount()) fillInvoloved(slider.value() - 1)
+  if (data.getRowCount()) fillInvoloved(slider.value() - 1);
 
   // draw info
   // drawInfo(slider.value() - 1);
@@ -127,8 +142,8 @@ function draw() {
   if (data.getRowCount()) drawCircle(slider.value()-1);
 
   // draw boxes
-  boxList.forEach(function(box) {
-    drawBox(box);
-  });
+  // boxList.forEach(function(box) {
+  //   drawBox(box);
+  // });
 
 }

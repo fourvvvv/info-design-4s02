@@ -7,6 +7,10 @@ function mousePressed() {
   });
 }
 
+function sliderChanged() {
+  updateIconPosition();
+}
+
 // clickable box: click -> change height (display details)
 function clickBox(box) {
   if (isInsideBox(box)) {
@@ -19,7 +23,6 @@ function clickBox(box) {
     }
   }
 }
-
 
 // return true id mouse is inside the box
 function isInsideBox(box) {
