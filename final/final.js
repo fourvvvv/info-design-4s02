@@ -60,7 +60,7 @@ function preload() {
       item.setImage(loadImage(path));
       // var thisSound = loadSound(path, storeSound);
     }).fail(function() {
-      // do something with the error
+      item.setImage(loadImage("img/house/NA.png"));
     });
     houseList.push(item);
   });
