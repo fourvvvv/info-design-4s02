@@ -5,13 +5,13 @@ TODO:
 5) time slider not equally divided
 6) change stupid drawing box -> put them into an array?
 7) ?? major_death & major_capture
-8) move house icons all the time
-  - matrix, house m vs house n
+* 8) move house icons all the time
   - Distance bewteen each other could be based on relationship (distant / close)
 10) image
   - get rid of errors
   - size correctly
 13) ??? whether use "currentInBattle"
+14) (maybe not) chanhge houses to be not hard coding in "data.js"
 
 DONE
 2) lesser houses emerge after they first involved
@@ -22,7 +22,7 @@ DONE
 8) move house icons all the time
   - at first, all Greater houses are shown in a row
   - move who's involved to the screen center, and move others to corner (and opacity)
-
+  - matrix, house m vs house n
 9) hover box to explain info
 11) format text size/align
 12) change to Class
@@ -45,29 +45,39 @@ var circleCenterX, circleCenterY, circleR
 var boxList = [];
 var houseList = [];
 var time = 0;
+var matrix = [];
 
 function preload() {
-
+  data = loadTable("data/battles.csv", "csv", "header");
 
   // put all House instance into houseList
-  houses.forEach(function(entry, i){
-    var item = new House(entry.name, entry.great == 1, 0, 0);
+  var counter = 0;
+  for (var key in houses) {
+    houses[key]["index"] = counter++;
+    var item = new House(key, houses[key]["great"] == 1, 0, 0);
 
     var img;
-    var path = "img/house/" + entry["name"] +".png";
-    $.get(path)
-    .done(function() {
-      item.setImage(loadImage(path));
-      // var thisSound = loadSound(path, storeSound);
-    }).fail(function() {
-      item.setImage(loadImage("img/house/NA.png"));
-    });
+    var path = "img/house/" + key +".png";
+    // $.get(path)
+    // .done(function() {
+    //   img = loadImage(path);
+    //   // var thisSound = loadSound(path, storeSound);
+    // }).fail(function() {
+    //   img = loadImage("img/house/NA.png");
+    // });
+    // img = loadImage(path);
+    // item.setImage(img);
     houseList.push(item);
-  });
+  }
+  console.log(houseList);
+
+  // build a [m x n] matrix of relations, m = n = #houses
+  // cell (x, y) = {enemy: #times houseX and houseY were against each other
+  //              , ally: #times houseX and houseY were at the same side}
+  initMatrix();
 }
 
 function setup() {
-  data = loadTable("data/battles.csv", "csv", "header");
   createCanvas(displayWidth, windowHeight);
 
   // init variables about sizes

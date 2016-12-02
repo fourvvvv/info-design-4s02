@@ -9,6 +9,7 @@ function mousePressed() {
 
 function sliderChanged() {
   updateIconPosition();
+  updateMatrix();
 }
 
 // clickable box: click -> change height (display details)

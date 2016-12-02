@@ -54,7 +54,7 @@ function drawCircle(index) {
       }
     } else {
       noFill();
-      if (house["involved"]) stroke(100 + houses[i]["involved"]/34 * 400);
+      if (house["involved"]) stroke(100 + house["involved"]/34 * 400);
       ellipse(house['x'], house['y'], 40);
       if (house["involved"]) fill(100 - house["involved"]/34 * 150);
       // textSize(10);

@@ -1,4 +1,66 @@
 // helpers
+function initMatrix() {
+  matrix = [];
+  for (var i in houses) {
+    matrix.push(0);
+    matrix[houses[i].index] = [];
+    for (var j in houses) {
+      matrix[houses[i].index].push(0);
+      matrix[houses[i].index][houses[j].index] = {enemy: 0, ally: 0};
+    }
+  }
+}
+
+function myPrintMatrix(a) {
+  console.log(a.length);
+  for (var i = 0; i < a.length; i++) {
+    var row = "";
+    for (var j = 0; j < a[0].length; j++) {
+      row += a[i][j]["enemy"] + ", ";
+    }
+    console.log(row);
+  }
+}
+
+function updateMatrix() {
+  initMatrix();
+
+  for (var t = 0; t <= time; t++) {
+    var housesInBattle = getHousesInBattle(t);
+    var attackers = housesInBattle["attackers"];
+    var defenders = housesInBattle["defenders"];
+
+    // ally
+    for (var i = 0; i < attackers.length; i++) {
+      for (var j = i + 1; j < attackers.length; j++) {
+        var h1 = houses[attackers[i]]["index"];
+        var h2 = houses[attackers[j]]["index"];
+        matrix[h1][h2]["ally"] += 1;
+      }
+    }
+
+    for (var i = 0; i < defenders.length; i++) {
+      for (var j = i + 1; j < defenders.length; j++) {
+        var h1 = houses[defenders[i]]["index"];
+        var h2 = houses[defenders[j]]["index"];
+        matrix[h1][h2]["ally"] += 1;
+      }
+    }
+
+    // enemy
+    for (var i = 0; i < attackers.length; i++) {
+      for (var j = 0; j < defenders.length; j++) {
+        var att = houses[attackers[i]]["index"];
+        var def = houses[defenders[j]]["index"];
+        matrix[att][def]["enemy"] += 1;
+      }
+    }
+  }
+
+  myPrintMatrix(matrix);
+  // }
+
+}
 
 function updateIconPosition() {
   houseList.forEach(function(house, i) {
