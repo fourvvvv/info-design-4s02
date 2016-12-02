@@ -17,10 +17,14 @@ House.prototype.setInvolved = function(i) {
   this.involved = i;
 }
 
-// House.prototype.setCurrentInBattle = function(side) {
-//   // side = 1 -> attacker, -1 -> defender
-//   this.currentInBattle = side;
-// }
+House.prototype.setCurrentInBattle = function(side) {
+  // side = 1 -> attacker, -1 -> defender
+  this.currentInBattle = side;
+}
+
+House.prototype.getCurrentInBattle = function(side) {
+  return this.currentInBattle;
+}
 
 House.prototype.getIsGreat = function() {
   return this.isGreat;

@@ -1,4 +1,32 @@
 // helpers
+function initHousePosition() {
+  houseList.forEach(function(entry, i){
+    if (entry.getIsGreat()) {
+      // entry.setPositon(width / 2 + (i - 4) * width/10, height / 2);
+      entry.setPositon(circleCenterX + circleR * sin(TAU / 9 * i)
+        , circleCenterY + circleR * cos(TAU / 9 * i));
+    } else {
+      entry.setPositon(circleCenterX + circleR*1.5 * sin(TAU / (24 - 9) * i)
+        , circleCenterY + circleR*1.4 * cos(TAU / (24 - 9) * i));
+    }
+  });
+}
+
+function moveToBattlefield() {
+  initHousePosition();
+
+  this.myHeight = height*0.8;
+  var housesInBattle = getHousesInBattle(time);
+  var attackers = housesInBattle["attackers"];
+  var defenders = housesInBattle["defenders"];
+
+  attackers.forEach(function(name, i) {
+    var att = findItemByValue(houseList, "name", name);
+    att.setPositon(circleCenterX + circleR/5 * sin(TAU / attackers.length * i)
+        , circleCenterY + circleR/5 * cos(TAU / attackers.length * i));
+  });
+}
+
 function initMatrix() {
   matrix = [];
   for (var i in houses) {
@@ -58,28 +86,28 @@ function updateMatrix() {
 
 }
 
-function updateIconPosition() {
-  houseList.forEach(function(house, i) {
-    house.setPositon(width * (i+1) / 34, height * 0.9);
-  });
-
-  this.myHeight = height*0.8;
-  var housesInBattle = getHousesInBattle(time);
-  var attackers = housesInBattle["attackers"];
-  var defenders = housesInBattle["defenders"];
-
-  attackers.forEach(function(name, i) {
-    findItemByValue(houseList, "name", name)
-      .setPositon(width*0.25
-        , (height-this.myHeight)/2 + this.myHeight/(attackers.length + 1)*(i+1));
-  });
-
-  defenders.forEach(function(name, i) {
-    findItemByValue(houseList, "name", name)
-      .setPositon(width*0.75
-        , (height-this.myHeight)/2 + this.myHeight/(defenders.length + 1)*(i+1));
-  });
-}
+// function updateIconPosition() {
+//   houseList.forEach(function(house, i) {
+//     house.setPositon(width * (i+1) / 34, height * 0.9);
+//   });
+//
+//   this.myHeight = height*0.8;
+//   var housesInBattle = getHousesInBattle(time);
+//   var attackers = housesInBattle["attackers"];
+//   var defenders = housesInBattle["defenders"];
+//
+//   attackers.forEach(function(name, i) {
+//     findItemByValue(houseList, "name", name)
+//       .setPositon(width*0.25
+//         , (height-this.myHeight)/2 + this.myHeight/(attackers.length + 1)*(i+1));
+//   });
+//
+//   defenders.forEach(function(name, i) {
+//     findItemByValue(houseList, "name", name)
+//       .setPositon(width*0.75
+//         , (height-this.myHeight)/2 + this.myHeight/(defenders.length + 1)*(i+1));
+//   });
+// }
 
 // TODO: change this stupid search...
 function findItemByValue(json, col, value) {

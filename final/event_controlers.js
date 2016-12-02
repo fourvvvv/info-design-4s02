@@ -9,6 +9,7 @@ function mousePressed() {
 
 function sliderChanged() {
   // updateIconPosition();
+  moveToBattlefield();
   updateMatrix();
 }
 

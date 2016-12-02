@@ -2,12 +2,12 @@
 
 // called by "drawBox"
 function drawHoverBox(content, w, h, x, y) {
-  this.width = 200;
-  this.height = 20;
-  this.x = x + this.width/2;
-  this.y = y + this.height/2;
+  this.myWidth = 200;
+  this.myHeight = 20;
+  this.x = x + this.myWidth/2;
+  this.y = y + this.myHeight/2;
   fill(0, 50);
-  rect(x, y, this.width, this.height);
+  rect(x, y, this.myWidth, this.myHeight);
   textAlign(CENTER, CENTER);
   // textSize(20);
   fill(255);
@@ -15,7 +15,7 @@ function drawHoverBox(content, w, h, x, y) {
 }
 
 function drawTitle() {
-  textAlign(CENTER, CENTER);
+  textAlign(LEFT, CENTER);
   textSize(20);
   fill(255);
   text("Battles in Game of Thromes", titleX, titleY);
@@ -46,20 +46,14 @@ function drawCircle(index) {
   // draw all houses
   houseList.forEach(function(house, i) {
     textAlign(CENTER, CENTER);
-    if (house["img"]) {
-      if (house["great"] || house["involved"]) {
-        fill(100 - house["involved"]/34 * 150);
-        image(house["img"], house['x']-40, house['y']-40, 80, 80);
-        text(house['name'], house['x'], house['y']+50);
+    if (house.getIsGreat() || house["involved"]) {
+      // if (house["involved"]) stroke(100 + house["involved"]/34 * 400);
+      fill((house["involved"]) ? 150 + house["involved"]/34 * 100 : 150);
+      if (house["img"]) {
+        image(house["img"], house['x']-20-20*house.getIsGreat(), house['y']-20-20*house.getIsGreat(), 40 + 40*house.getIsGreat(), 40 + 40*house.getIsGreat());
       }
-    } else {
-      noFill();
-      if (house["involved"]) stroke(100 + house["involved"]/34 * 400);
-      ellipse(house['x'], house['y'], 40);
-      if (house["involved"]) fill(100 - house["involved"]/34 * 150);
-      // textSize(10);
-      noStroke();
-      text(house['name'], house['x'], house['y']);
+      // ellipse(house['x'], house['y'], 40);
+      text(house['name'], house['x'], house['y']+30+20*house.getIsGreat());
     }
   });
 
@@ -81,11 +75,11 @@ function drawCircle(index) {
   noStroke();
   strokeWeight(1);
 }
-var test = 0;
+
 function drawBox(box) {
-  fill(255, 50);
-  strokeWeight(1);
-  stroke(255);
+  fill(255, 20);
+  strokeWeight(.7);
+  stroke(255, 50);
   rect(box.left, box.top, box.width, box.height);
   textAlign(CENTER, TOP);
   fill(255);
@@ -118,4 +112,22 @@ function drawBox(box) {
   if (isInsideBox(box)) {
     drawHoverBox(box.title, box.width, box.height, mouseX, mouseY);
   }
+}
+
+function drawText() {
+  textAlign(LEFT, TOP);
+  fill(255, 150);
+  textSize(12);
+  text("Untorem dolut que et ratiant isimaio nsecab\n" +
+        "ceptu restia conet ab im fugitis ut auta s\n" +
+        "renda dolum quia ventia provid mo- luptati\n" +
+        "odici endestior mo et pero blabori o ctis \n" +
+        "eum audae imoloris con restia delicid\n" +
+        "ceptu restia conet ab im fugitis ut auta s\n" +
+        "renda dolum quia ventia provid mo- luptati\n" +
+        "odici endestior mo et pero blabori o ctis \n" +
+        "eum audae imoloris con restia delicid\n" +
+        "quam as dolendi berum nihitatum"
+    , width*0.03
+    , height*0.34);
 }
