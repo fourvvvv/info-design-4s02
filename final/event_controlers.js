@@ -8,7 +8,7 @@ function mousePressed() {
 }
 
 function sliderChanged() {
-  updateIconPosition();
+  // updateIconPosition();
   updateMatrix();
 }
 

@@ -12,7 +12,6 @@ function initMatrix() {
 }
 
 function myPrintMatrix(a) {
-  console.log(a.length);
   for (var i = 0; i < a.length; i++) {
     var row = "";
     for (var j = 0; j < a[0].length; j++) {
@@ -56,9 +55,6 @@ function updateMatrix() {
       }
     }
   }
-
-  myPrintMatrix(matrix);
-  // }
 
 }
 

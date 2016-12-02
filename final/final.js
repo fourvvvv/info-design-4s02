@@ -69,7 +69,6 @@ function preload() {
     // item.setImage(img);
     houseList.push(item);
   }
-  console.log(houseList);
 
   // build a [m x n] matrix of relations, m = n = #houses
   // cell (x, y) = {enemy: #times houseX and houseY were against each other
@@ -112,13 +111,20 @@ function setup() {
   slider.position(sliderStartX, sliderY);
   slider.style("width", sliderWidth + "px");
 
+  circleCenterX = width*0.5;
+  circleCenterY = height*0.5;
+  circleR = height*0.2;
   // setup Greater Houses' positions
   houseList.forEach(function(entry, i){
     if (entry.getIsGreat()) {
-      entry.setPositon(width / 2 + (i - 4) * width/10, height / 2);
+      // entry.setPositon(width / 2 + (i - 4) * width/10, height / 2);
+      entry.setPositon(circleCenterX + circleR * sin(TAU / 9 * i)
+        , circleCenterY + circleR * cos(TAU / 9 * i));
+    } else {
+      entry.setPositon(circleCenterX + circleR*1.5 * sin(TAU / (24 - 9) * i)
+        , circleCenterY + circleR*1.5 * cos(TAU / (24 - 9) * i));
     }
   });
-
 
 }
 
@@ -131,10 +137,10 @@ function draw() {
   background(51);
 
   fill(238, 162, 173);
-  rect(0, 0, width/2, height);
+  rect(0, 0, width, height);
 
-  fill(121, 129, 116);
-  rect(width/2, 0, width/2, height);
+  // fill(121, 129, 116);
+  // rect(width/2, 0, width/2, height);
 
   // draw title
   drawTitle();
@@ -143,13 +149,13 @@ function draw() {
   drawTimeSlider();
 
   // fill involoved
-  if (data.getRowCount()) fillInvoloved(slider.value() - 1);
+  if (data.getRowCount()) fillInvoloved(time);
 
   // draw info
   // drawInfo(slider.value() - 1);
 
   // draw circle
-  if (data.getRowCount()) drawCircle(slider.value()-1);
+  if (data.getRowCount()) drawCircle(time);
 
   // draw boxes
   // boxList.forEach(function(box) {
