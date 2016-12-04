@@ -14,6 +14,9 @@
 //   text(content, this.x, this.y);
 // }
 
+var attColor = "#cd5c5c";
+var defColor = "#538370";
+
 function drawTimeSlider() {
   var grayColor = color(200);
   push();
@@ -126,11 +129,11 @@ function drawCircle(index) {
       }
 
       if (house.getCurrentInBattle() === 1) {
-        fill(253, 201, 68);
+        fill(attColor);
         textSize(15);
         text(house['name'], house['x'], house['y']+30+20*house.getIsGreat());
       } else if (house.getCurrentInBattle() === -1) {
-        fill(255);
+        fill(defColor);
         textSize(15);
         text(house['name'], house['x'], house['y']+30+20*house.getIsGreat());
       } else {
@@ -170,6 +173,46 @@ function drawCircle(index) {
   strokeWeight(1);
 }
 
+function drawSizeInfo(box) {
+  var attSize = parseInt(data.getColumn(box.feature[0])[time]);
+  var defSize = parseInt(data.getColumn(box.feature[1])[time]);
+  var total = attSize + defSize;
+  if (attSize && defSize) {
+    var left = box.left;
+    var right = box.right;
+    var height = box.height * 0.5;
+    var width= box.width;
+    var top = box.bottom - height;
+
+    var attSize1 = map(attSize, 0, total, 0, box.width);
+    var defSize1 = map(defSize, 0, total, 0, box.width);
+
+
+    // draw bars
+    push();
+    textAlign(LEFT, TOP);
+    fill(attColor);
+    rect(left, top, attSize1, height);
+    fill(255, 200);
+    text(attSize + " ("+ nf(attSize/total*100, 0, 1) +"%)", left+2, top+2);
+    fill(defColor);
+    rect(right-defSize1, top, defSize1, height);
+    fill(255, 200);
+    text(defSize + " ("+ nf(defSize/total*100, 0, 1) +"%)", right-defSize1+2, top+2);
+    pop();
+
+    // draw title
+    push();
+    textFont(font28);
+    textSize(15);
+    textAlign(LEFT, BOTTOM);
+    fill(255);
+    text("Battle Size", left+5, top-2);
+    pop();
+  }
+
+}
+
 function drawAttDefInfo(box) {
   var height = box.height*0.9;
   var top = box.bottom - height;
@@ -187,7 +230,7 @@ function drawAttDefInfo(box) {
 
   // left box
   push();
-  (ifAttWin) ? fill(200, 0, 0, 50) : fill(255, 50);
+  (ifAttWin) ? fill(attColor) : fill(255, 50);
   rect(left, top, width, height);
   pop();
   // left title
@@ -233,7 +276,7 @@ function drawAttDefInfo(box) {
 
   // right box
   push();
-  (!ifAttWin) ? fill(0, 200, 0, 50) : fill(255, 50);
+  (!ifAttWin) ? fill(defColor) : fill(255, 50);
   rect(right, top, width, height);
   pop();
   // right title
@@ -314,6 +357,8 @@ function drawBox(box) {
       pop();
     } else if (box.title == "Attackers vs Defenders") {
       drawAttDefInfo(box);
+    } else if (box.title == "size") {
+      drawSizeInfo(box);
     }
   } else {
     // if clickable: display title
