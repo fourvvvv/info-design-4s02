@@ -1,5 +1,25 @@
 // helpers
 
+
+function preProcessKings() {
+  var kings = data.getColumn("attacker_king").concat(data.getColumn("defender_king"));
+  var kingsHash = {};
+  kings.forEach(function(k) {
+    if (!kingsHash[k] && k) {
+      // kingsHash[k] = null;
+      var path;
+      if (k == "Balon/Euron Greyjoy") {
+        path = "img/people/BalonGreyjoy.jpg";
+      } else if (k == "Joffrey/Tommen Baratheon") {
+        path = "img/people/JoffreyBaratheon.jpg";
+      } else {
+        path = "img/people/" + k.replace(/ /g,"") +".jpg";
+      }
+      kingsHash[k] = loadImage(path);
+    }
+  });
+  return kingsHash;
+}
 // TODO: should have more elegent way :(
 // process time to be dot's position in the time slider/bar
 function preProcessTimeBar() {

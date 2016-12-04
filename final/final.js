@@ -2,17 +2,15 @@
 TODO:
 3) Bolton betrayed
 6) change stupid drawing box -> put them into an array?
-7) ?? major_death & major_capture
-8) move house icons all the time
+7) (maybe not)  major_death & major_capture
+8) (maybe not) move house icons all the time
   - Distance bewteen each other could be based on relationship (distant / close)
 10) image
-  - get rid of errors
   - size correctly
-13) ??? whether use "currentInBattle"
+13) (maybe not)  whether use "currentInBattle"
 14) (maybe not) change houses to be not hard coding in "data.js"
 16) formatting
   - sheild mask
-17) att vs def
 
 DONE
 1) arrow - bezier() & line
@@ -27,6 +25,8 @@ DONE
   - move who's involved to the screen center, and move others to corner (and opacity)
   - matrix, house m vs house n
 9) hover box to explain info
+10) image
+  - get rid of errors -> found images for all houses
 11) format text size/align
 12) change to Class
 15) animation
@@ -35,6 +35,7 @@ DONE
   - team together
   - non-battle ones stepback/smaller -> transparency
 17) time - display year and current time
+18) att vs def
 
 *****/
 
@@ -60,18 +61,17 @@ var animating = false;
 var TimeBarXs;
 var sliderSize;
 var timeMouseOver = 0;
-var speed = 40;
+var speed = 20;
 var years;
 var yearIndex = {};
+var kingsImg;
+var boxLeft, boxTop;
 
 function preload() {
   data = loadTable("data/battles.csv", "csv", "header");
   font28 = loadFont('fonts/28DaysLater.ttf');
   fontGOT = loadFont('fonts/GameOfThrones.ttf');
-}
-
-function setup() {
-  createCanvas(displayWidth, windowHeight);
+  fontTrueLies = loadFont('fonts/TrueLies.ttf');
 
   // put all House instance into houseList
   var counter = 0;
@@ -80,9 +80,10 @@ function setup() {
     houseList.push(new House(key, houses[key]["great"] == 1, 0, 0));
   }
 
+  // load house images
   houseList.forEach(function(house, i) {
     var img;
-    var path = "img/house/" + house.name +".png";
+    var path = "img/house/" + house.name.replace(/ /g,"") +".png";
     $.get(path)
     .done(function() {
       house.setImage(loadImage(path));
@@ -91,12 +92,18 @@ function setup() {
     });
   });
 
+}
+
+function setup() {
+  createCanvas(displayWidth, windowHeight);
+
   // build a [m x n] matrix of relations, m = n = #houses
   // cell (x, y) = {enemy: #times houseX and houseY were against each other
   //              , ally: #times houseX and houseY were at the same side}
   initMatrix();
 
   years = data.getColumn("year");
+  kingsImg = preProcessKings();
 
   for (var i = 0; i < years.length; i++) {
     if (yearIndex[years[i]]) {
@@ -127,31 +134,27 @@ function setup() {
   sliderSize.play.top = sliderSize.play.centerY - sliderSize.play.width;
   sliderSize.play.bottom = sliderSize.play.centerY + sliderSize.play.width;
 
-  titleX = width*0.03;
-  titleY = height*0.3;
+  titleX = width*0.02;
+  titleY = height*0.2;
 
   TimeBarXs = preProcessTimeBar();
 
+  boxLeft = width*0.77;
+  boxTop = height*0.15;
   boxList.push(new Box("Battle Type"
-              , width*0.2, height*0.04, width*0.78, height*0.15
+              , width*0.2, height*0.04, boxLeft, boxTop+height*0.07
               , ["battle_type"]
               , -1));
   boxList.push(new Box("Attackers vs Defenders"
-              , width*0.2, height*0.04, width*0.78, height*0.2
+              , width*0.2, height*0.36, boxLeft, boxTop+height*0.12
               , ["attacker_king", "defender_king"
                 ,	"attacker_1",	"attacker_2",	"attacker_3",	"attacker_4"
                 ,	"defender_1",	"defender_2",	"defender_3",	"defender_4"]
-              , 6.5));
-  // boxList.push(new Box("Houses involved in battles"
-  //             , width*0.2, height*0.05, width*0.05, height*0.65
-  //             , ["house"]
-  //             , 7));
-  // boxList.push(new Box("Major Death"
-  //             , width*0.2, height*0.05, width*0.75, height*0.25
-  //             , ["major_death"]));
-  // boxList.push(new Box("Major Capture"
-  //             , width*0.2, height*0.05, width*0.75, height*0.65
-  //             , ["major_capture"]));
+              , -1));
+  boxList.push(new Box("size"
+              , width*0.2, height*0.05, boxLeft, boxTop+height*(0.12+0.36+0.01)
+              , ["attacker_size", "defender_size"]
+              , -1));
 
   circleCenterX = width*0.5;
   circleCenterY = height*0.5;
@@ -180,7 +183,7 @@ function draw() {
   // rect(width/2, 0, width/2, height);
 
   // draw title
-  drawText();
+  drawText(titleX, titleY + height*0.05);
 
   // draw time slider
   drawTimeSlider();
@@ -199,7 +202,7 @@ function draw() {
     drawBox(box);
   });
   drawTitle();
-  // textSize(10);
+  drawRightSec(boxLeft, boxTop, width*0.2, height*0.55);
 
 
 }

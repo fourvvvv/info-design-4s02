@@ -1,28 +1,18 @@
 // This file contains all functions drawing components
 
 // called by "drawBox"
-function drawHoverBox(content, w, h, x, y) {
-  this.myWidth = 200;
-  this.myHeight = 20;
-  this.x = x + this.myWidth/2;
-  this.y = y + this.myHeight/2;
-  fill(0, 50);
-  rect(x, y, this.myWidth, this.myHeight);
-  textAlign(CENTER, CENTER);
-  // textSize(20);
-  fill(255);
-  text(content, this.x, this.y);
-}
-
-function drawTitle() {
-  push();
-  textAlign(LEFT, CENTER);
-  textSize(20);
-  fill(255);
-  textFont(fontGOT);
-  text("GAME  OF  THRONES  BATTLES", titleX, titleY);
-  pop();
-}
+// function drawHoverBox(content, w, h, x, y) {
+//   this.myWidth = 200;
+//   this.myHeight = 20;
+//   this.x = x + this.myWidth/2;
+//   this.y = y + this.myHeight/2;
+//   fill(0, 50);
+//   rect(x, y, this.myWidth, this.myHeight);
+//   textAlign(CENTER, CENTER);
+//   // textSize(20);
+//   fill(255);
+//   text(content, this.x, this.y);
+// }
 
 function drawTimeSlider() {
   var grayColor = color(200);
@@ -85,18 +75,6 @@ function drawTimeSlider() {
       text(temp, TimeBarXs[i], sliderSize.bottom);
     }
   }
-  // scrubber
-  // var x = map(yrIdx, 0, years.length-1, timelineX, timelineX + timelineW);
-  // ellipse(x, timelineY, 10, 10);
-  // noStroke();
-  // textAlign(CENTER, TOP);
-  // textFont(adelleRegular);
-  // textSize(littleFontSize);
-  // text(years[0], timelineX, timelineY + 10);
-  // var xmid = map(ceil((years.length - 1)/2), 0, years.length - 1,
-  //   timelineX, timelineX + timelineW);
-  // text(years[ceil((years.length - 1)/2)], xmid, timelineY + 10);
-  // text(years[years.length - 1], timelineX + timelineW, timelineY + 10);
 }
 
 function drawInfo(index) {
@@ -192,6 +170,129 @@ function drawCircle(index) {
   strokeWeight(1);
 }
 
+function drawAttDefInfo(box) {
+  var height = box.height*0.9;
+  var top = box.bottom - height;
+  var width = box.width*0.4;
+  var gap = (box.width - width*2)/3;
+  var left = box.left + gap;
+  var right = left + width + gap;
+  var imageWidth = width*0.8;
+
+  var attKing = data.getColumn(box.feature[0])[time];
+  var defKing = data.getColumn(box.feature[1])[time];
+  var attCom = data.getColumn("attacker_commander")[time].split(', ');
+  var defCom = data.getColumn("defender_commander")[time].split(', ');
+  var ifAttWin = data.getColumn("attacker_outcome")[time] === "win";
+
+  // left box
+  push();
+  (ifAttWin) ? fill(200, 0, 0, 50) : fill(255, 50);
+  rect(left, top, width, height);
+  pop();
+  // left title
+  push();
+  textAlign(CENTER, TOP);
+  textFont(font28);
+  textSize(20);
+  text("Attackers", left + width/2, box.top);
+  pop();
+  // left info
+  // console.log(attKing);
+  // console.log(defKing);
+  if (attKing) {
+    image(kingsImg[attKing], left+(width - imageWidth)/2, top+10, imageWidth, imageWidth);
+    push();
+    textAlign(CENTER, TOP);
+    textSize(10);
+    fill(253, 201, 68);
+    text(attKing, left+width/2, top+imageWidth+15);
+    pop();
+    if (attCom) {
+      push();
+      textAlign(CENTER, TOP);
+      textSize(10);
+      attCom.forEach(function(com, i) {
+        text(com, left+width/2, top+imageWidth+15 + (i+1) * 15);
+      });
+      pop();
+    } else {
+      push();
+      textAlign(CENTER, TOP);
+      textSize(20);
+      text("No Commander", left+width/2, top+imageWidth/2);
+      pop();
+    }
+  } else {
+    push();
+    textAlign(CENTER, TOP);
+    textSize(20);
+    text("No King", left+width/2, top+imageWidth/2);
+    pop();
+  }
+
+  // right box
+  push();
+  (!ifAttWin) ? fill(0, 200, 0, 50) : fill(255, 50);
+  rect(right, top, width, height);
+  pop();
+  // right title
+  push();
+  textAlign(CENTER, TOP);
+  textFont(font28);
+  textSize(20);
+  text("Defenders", right + width/2, box.top);
+  pop();
+  // right info
+  if (defKing) {
+    image(kingsImg[defKing], right+(width - imageWidth)/2, top+10, imageWidth, imageWidth);
+    push();
+    textAlign(CENTER, TOP);
+    textSize(10);
+    fill(253, 201, 68);
+    text(defKing, right+width/2, top+imageWidth+15);
+    pop();
+    if (defCom) {
+      push();
+      textAlign(CENTER, TOP);
+      textSize(10);
+      defCom.forEach(function(com, i) {
+        text(com, right+width/2, top+imageWidth+15 + (i+1) * 15);
+      });
+      pop();
+    } else {
+      push();
+      textAlign(CENTER, TOP);
+      textSize(20);
+      text("No Commander", right+width/2, top+imageWidth/2);
+      pop();
+    }
+  } else {
+    push();
+    textAlign(CENTER, TOP);
+    textSize(20);
+    text("No King", right+width/2, top+imageWidth/2);
+    pop();
+  }
+
+  // win label
+  push();
+  textFont(font28);
+  textSize(25);
+  if (ifAttWin) {
+    translate(left, box.top+30);
+    rotate(-PI/5);
+    fill(253, 201, 68);
+    text("WIN", 0, 0);
+  } else {
+    translate(right, box.top+30);
+    rotate(-PI/5);
+    fill(253, 201, 68);
+    text("WIN", 0, 0);
+  }
+  pop();
+}
+
 function drawBox(box) {
   fill(255, 20);
   strokeWeight(.7);
@@ -200,10 +301,20 @@ function drawBox(box) {
   textAlign(CENTER, TOP);
   fill(255);
   noStroke();
+
   // if the box is not clickable: always display info
   if (!box.clickable) {
-    var info = box.title + ": " + data.getColumn(box.feature[0])[time];
-    text(info, box.left + box.width / 2, box.top + 5);
+    if (box.title == "Battle Type") {
+      push();
+      textFont(font28);
+      textSize(15);
+      textAlign(LEFT, CENTER);
+      var info = "This is a " + data.getColumn(box.feature[0])[time];
+      text(info, box.left + 23, box.top + box.height/2);
+      pop();
+    } else if (box.title == "Attackers vs Defenders") {
+      drawAttDefInfo(box);
+    }
   } else {
     // if clickable: display title
     text(box.title, box.left + box.width / 2, box.top + 5);
@@ -225,12 +336,22 @@ function drawBox(box) {
     }
   }
   // hover: display details
-  if (isInsideBox(box)) {
-    drawHoverBox(box.title, box.width, box.height, mouseX, mouseY);
-  }
+  // if (isInsideBox(box)) {
+  //   drawHoverBox(box.title, box.width, box.height, mouseX, mouseY);
+  // }
 }
 
-function drawText() {
+function drawTitle() {
+  push();
+  textAlign(LEFT, CENTER);
+  textSize(20);
+  fill(255);
+  textFont(fontGOT);
+  text("GAME  OF  THRONES  BATTLES", titleX, titleY);
+  pop();
+}
+
+function drawText(x, y) {
   textAlign(LEFT, TOP);
   fill(255, 150);
   textSize(12);
@@ -244,6 +365,24 @@ function drawText() {
         "odici endestior mo et pero blabori o ctis \n" +
         "eum audae imoloris con restia delicid\n" +
         "quam as dolendi berum nihitatum"
-    , width*0.03
-    , height*0.34);
+    , x, y);
+}
+
+
+function drawRightSec(x, y, w, h) {
+  // draw a info board
+  push();
+  fill(0, 50);
+  stroke(255, 100);
+  strokeWeight(0.5);
+  rect(x, y, w, h);
+  pop();
+
+  // draw board title
+  push();
+  textAlign(CENTER, TOP);
+  textFont(font28);
+  textSize(30);
+  text("INFORMATION", x+w/2, y+h/30);
+  pop();
 }
