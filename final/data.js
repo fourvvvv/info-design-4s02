@@ -1,15 +1,16 @@
 var houses = {
   "Arryn": {great: 1},
-  "Baratheon": {great: 1},
   "Greyjoy": {great: 1},
   "Lannister": {great: 1},
   "Stark": {great: 1},
   "Targaryen": {great: 1},
   "Tully": {great: 1},
+  "Baratheon": {great: 1},
   "Martell": {great: 1},
   "Tyrell": {great: 1},
   "Frey": {great: 0},
   "Bolton": {great: 0},
+  "Night's Watch": {great: 0},
   "Brave Companions": {great: 0},
   "Glover": {great: 0},
   "Mormont": {great: 0},
@@ -22,7 +23,6 @@ var houses = {
   "Giants": {great: 0},
   "Blackwood": {great: 0},
   "Bracken": {great: 0},
-  "Night's Watch": {great: 0},
 };
 
 

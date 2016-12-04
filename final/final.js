@@ -1,8 +1,6 @@
 /*****
 TODO:
-1) arrow
 3) Bolton betrayed
-* 5) time slider not equally divided
 6) change stupid drawing box -> put them into an array?
 7) ?? major_death & major_capture
 8) move house icons all the time
@@ -12,14 +10,18 @@ TODO:
   - size correctly
 13) ??? whether use "currentInBattle"
 14) (maybe not) change houses to be not hard coding in "data.js"
-* 15) animation
+16) formatting
+  - sheild mask
+17) att vs def
 
 DONE
+1) arrow - bezier() & line
 2) lesser houses emerge after they first involved
   - if house involved a battle, set "involved" as 1
   - only display house whose "involved" == 1
   - houses' #battle -> color
 4) crawler: get icon image for each house
+5) time slider not equally divided
 8) move house icons all the time
   - at first, all Greater houses are shown in a row
   - move who's involved to the screen center, and move others to corner (and opacity)
@@ -27,6 +29,12 @@ DONE
 9) hover box to explain info
 11) format text size/align
 12) change to Class
+15) animation
+16) formatting
+  - not show all labels
+  - team together
+  - non-battle ones stepback/smaller -> transparency
+17) time - display year and current time
 
 *****/
 
@@ -41,15 +49,29 @@ var slider;
 var data;
 var img = [];
 var circleCenterX, circleCenterY, circleR
-  , sliderStartX, sliderY, sliderWidth
   , titleX, titleY;
 var boxList = [];
 var houseList = [];
 var time = 0;
+var pTime = time;
+
 var matrix = [];
+var animating = false;
+var TimeBarXs;
+var sliderSize;
+var timeMouseOver = 0;
+var speed = 40;
+var years;
+var yearIndex = {};
 
 function preload() {
   data = loadTable("data/battles.csv", "csv", "header");
+  font28 = loadFont('fonts/28DaysLater.ttf');
+  fontGOT = loadFont('fonts/GameOfThrones.ttf');
+}
+
+function setup() {
+  createCanvas(displayWidth, windowHeight);
 
   // put all House instance into houseList
   var counter = 0;
@@ -73,17 +95,42 @@ function preload() {
   // cell (x, y) = {enemy: #times houseX and houseY were against each other
   //              , ally: #times houseX and houseY were at the same side}
   initMatrix();
-}
 
-function setup() {
-  createCanvas(displayWidth, windowHeight);
+  years = data.getColumn("year");
 
+  for (var i = 0; i < years.length; i++) {
+    if (yearIndex[years[i]]) {
+      yearIndex[years[i]]++;
+    } else {
+      if (i === 0) {
+        yearIndex[years[i]] = 1;
+      } else {
+        yearIndex[years[i]] = parseInt(yearIndex[years[i - 1]]) + 1;
+      }
+    }
+  }
   // init variables about sizes
-  sliderWidth = width*0.6;
-  sliderStartX = (width - sliderWidth)/2;
-  sliderY = height*0.9;
+  sliderSize = {width: width*0.28
+          , left: width*0.03
+          , top: height*0.8
+          , play: {
+              width: 20
+            }
+          };
+  sliderSize.right = sliderSize.left + sliderSize.width;
+  sliderSize.bottom = sliderSize.top + sliderSize.play.width*2;
+  sliderSize.play.centerX = sliderSize.left - sliderSize.play.width;
+  sliderSize.play.centerY = (sliderSize.top + sliderSize.bottom)/2;
+  // sliderSize.play.centerY = sliderSize.top;
+  sliderSize.play.left = sliderSize.play.centerX - sliderSize.play.width;
+  sliderSize.play.right = sliderSize.play.centerX + sliderSize.play.width;
+  sliderSize.play.top = sliderSize.play.centerY - sliderSize.play.width;
+  sliderSize.play.bottom = sliderSize.play.centerY + sliderSize.play.width;
+
   titleX = width*0.03;
   titleY = height*0.3;
+
+  TimeBarXs = preProcessTimeBar();
 
   boxList.push(new Box("Battle Type"
               , width*0.2, height*0.04, width*0.78, height*0.15
@@ -106,10 +153,6 @@ function setup() {
   //             , width*0.2, height*0.05, width*0.75, height*0.65
   //             , ["major_capture"]));
 
-  slider = createSlider(1, 38, 1, 1);
-  slider.position(sliderStartX, sliderY);
-  slider.style("width", sliderWidth + "px");
-
   circleCenterX = width*0.5;
   circleCenterY = height*0.5;
   circleR = height*0.3;
@@ -117,15 +160,19 @@ function setup() {
   initHousePosition();
 
 }
-
 function draw() {
-  if (slider.value() - 1 !== time) {
-    time = slider.value() - 1;
-    sliderChanged();
+  if (pTime !== time) {
+    // move once
+    moveToBattlefield();
+    fillCurrentInBattle(time);
+    pTime = time;
   }
 
-  background(51);
+  // keep tracking updating
+  updateHousePosition();
 
+  background(51);
+  moveTimeCursor();
   // fill(238, 162, 173);
   // rect(0, 0, width, height);
 
@@ -133,7 +180,6 @@ function draw() {
   // rect(width/2, 0, width/2, height);
 
   // draw title
-  drawTitle();
   drawText();
 
   // draw time slider
@@ -152,6 +198,8 @@ function draw() {
   boxList.forEach(function(box) {
     drawBox(box);
   });
+  drawTitle();
+  // textSize(10);
 
 
 }
