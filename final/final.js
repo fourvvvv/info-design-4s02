@@ -72,7 +72,7 @@ function preload() {
   font28 = loadFont('fonts/28DaysLater.ttf');
   fontGOT = loadFont('fonts/GameOfThrones.ttf');
   fontTrueLies = loadFont('fonts/TrueLies.ttf');
-
+  bg = loadImage("img/bg.jpg");
   // put all House instance into houseList
   var counter = 0;
   for (var key in houses) {
@@ -174,7 +174,7 @@ function draw() {
   // keep tracking updating
   updateHousePosition();
 
-  background(51);
+  background(bg);
   moveTimeCursor();
   // fill(238, 162, 173);
   // rect(0, 0, width, height);

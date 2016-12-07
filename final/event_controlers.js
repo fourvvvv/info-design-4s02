@@ -87,7 +87,7 @@ function clickBox(box) {
   }
 }
 
-// return true id mouse is inside the box
+// return true if mouse is inside the box
 function isInsideBox(box) {
   return mouseX >= box.left
       && mouseX <= box.right

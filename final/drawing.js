@@ -241,8 +241,6 @@ function drawAttDefInfo(box) {
   text("Attackers", left + width/2, box.top);
   pop();
   // left info
-  // console.log(attKing);
-  // console.log(defKing);
   if (attKing) {
     image(kingsImg[attKing], left+(width - imageWidth)/2, top+10, imageWidth, imageWidth);
     push();
