@@ -1,21 +1,57 @@
 // This file contains all functions drawing components
 
-// called by "drawBox"
-// function drawHoverBox(content, w, h, x, y) {
-//   this.myWidth = 200;
-//   this.myHeight = 20;
-//   this.x = x + this.myWidth/2;
-//   this.y = y + this.myHeight/2;
-//   fill(0, 50);
-//   rect(x, y, this.myWidth, this.myHeight);
-//   textAlign(CENTER, CENTER);
-//   // textSize(20);
-//   fill(255);
-//   text(content, this.x, this.y);
-// }
+function drawStartIntro(x, y, w, h) {
+  push();
+  textSize(50);
+  fill(255, 200);
+  textAlign(CENTER, CENTER);
+  textFont(fontGOT);
+  text("#   Battles", width/2, height*0.25);
+  pop();
+  push();
+  strokeWeight(2);
+  stroke(0, 200);
+  fill(255, 200);
+  rect(x, y, w, h);
+  // intro
+  textAlign(LEFT, CENTER);
+  textFont(fontFrankGotRom);
+  textSize(15);
+  strokeWeight(1);
+  stroke(0, 50);
+  fill(0, 200);
+  text("Hey there, welcome to Game Of Thrones Battles\n\n"
+     + "Here you will explore various battles in the Game of Thrones,\n\n"
+     + "changes on house relations, and characters involved in battles\n\n"
+     + "Ready to explore?"
+     , x + w/10, height/2 - 10);
 
-var attColor = "#cd5c5c";
-var defColor = "#538370";
+  textAlign(CENTER, CENTER);
+  fill(0, 100);
+  text("- Press any Key to start - ", width/2, y + h - 20);
+  pop();
+}
+
+// called by "drawBox"
+function drawHoverBox(content, x, y) {
+  this.myWidth = 220;
+  this.myHeight = 20;
+  this.x = x + this.myWidth/2;
+  this.y = y + this.myHeight/2;
+  push();
+  fill(255, 200);
+  rect(x, y+20, this.myWidth, this.myHeight);
+  textFont(fontFrankGotRom);
+  textAlign(CENTER, CENTER);
+  textSize(10);
+  noStroke();
+  fill(0, 200);
+  text(content, this.x, this.y + 20);
+  pop();
+}
+
+var attColor = "#fbb034";
+var defColor = "#cebcb2";
 
 function drawShield(x, y, w, h) {
   beginShape();
@@ -52,9 +88,23 @@ function drawBattleBar(left, top, myWidth, myHeight) {
     push();
     stroke(255, 200);
     strokeWeight(0.5);
-    fill(HEXtoRGB(attColor).r, HEXtoRGB(attColor).g, HEXtoRGB(attColor).b, 180);
+    var leftBox = {left: left, top: top, right: left+attSize1, bottom: top+myHeight};
+    var rightBox = {left: left+myWidth-defSize1, top: top, right: left+myWidth, bottom: top+myHeight};
+    if (isInsideBox(leftBox)) {
+      leftBox.op = 255;
+      drawHoverBox(attSize + " people were involved in attacker teams", mouseX, mouseY);
+    } else {
+      leftBox.op = 180;
+    }
+    fill(HEXtoRGB(attColor).r, HEXtoRGB(attColor).g, HEXtoRGB(attColor).b, leftBox.op);
     rect(left, top, attSize1, myHeight);
-    fill(HEXtoRGB(defColor).r, HEXtoRGB(defColor).g, HEXtoRGB(defColor).b, 180);
+    if (isInsideBox(rightBox)) {
+      rightBox.op = 255;
+      drawHoverBox(defSize + " people were involved in defender teams", mouseX, mouseY);
+    } else {
+      rightBox.op = 180;
+    }
+    fill(HEXtoRGB(defColor).r, HEXtoRGB(defColor).g, HEXtoRGB(defColor).b, rightBox.op);
     rect(left+myWidth-defSize1, top, defSize1, myHeight);
 
     noStroke();
@@ -189,8 +239,10 @@ function drawCircle(index) {
   // draw all houses
   push();
   textFont(fontFrankGotRom);
+  textAlign(CENTER, BOTTOM);
   houseList.forEach(function(house, i) {
-    textAlign(CENTER, BOTTOM);
+    // this push-pop is to isolate "tint" func
+    push();
     if (house.getIsGreat() || house["involved"]) {
       // if (house["involved"]) stroke(100 + house["involved"]/34 * 400);
       fill((house["involved"]) ? 150 + house["involved"]/34 * 100 : 150);
@@ -209,17 +261,17 @@ function drawCircle(index) {
         if (house["img"]) image(house["img"], house['x']-20-20*house.getIsGreat(), house['y']-20-20*house.getIsGreat(), 40 + 40*house.getIsGreat(), 40 + 40*house.getIsGreat());
       } else {
         textSize(10);
-        fill(255, 100);
+        if (!house.isMouseOver()) {
+          tint(255, 80);
+          fill(255, 100);
+        } else {
+          fill(255, 200);
+        }
         text((house["name"] === "Brave Companions") ? "Brave\nCompanions" : house['name'], house['x'], house['y']-20-20*house.getIsGreat());
-        push();
-        tint(255, 80);
         if (house["img"]) image(house["img"], house['x']-20-20*house.getIsGreat(), house['y']-20-20*house.getIsGreat(), 40 + 40*house.getIsGreat(), 40 + 40*house.getIsGreat());
-        pop();
-        // fill(51, 150);
-        // rect(house['x']-20-20*house.getIsGreat(), house['y']-20-20*house.getIsGreat(), 40 + 40*house.getIsGreat(), 40 + 40*house.getIsGreat());
       }
-      // ellipse(house['x'], house['y'], 40);
     }
+    pop();
   });
   pop();
 
@@ -233,27 +285,40 @@ function drawCircle(index) {
       var def = findItemByValue(houseList, 'name', defenders[j]);
       // if (att && def) line(att['x'], att['y'], def['x'], def['y']);
       if (att && def) {
-        var x1 = att['x']+20+12*att.getIsGreat();
-        var y1 = att['y'];
-        var x2 = def['x']-20-12*def.getIsGreat();
-        var y2 = def['y'];
-        var dx = x2 - x1;
-        var dy = y2 - y1;
-        bezier(x1, y1
-              , x1 + dx/10, y1 + dy/3
-              , x1 + dx/3*2, y1 + dy/10*9
-              , x2, y2);
-        // push();
-        // fill(255);
-        // beginShape();
-        // // console.log((dx > 0) ? x2-10 : x2+10, y2
-        // //             , x2, y2
-        // //           , );
-        // vertex((dx > 0) ? x2-10 : x2+10, y2);
-        // vertex(x2, y2)
-        // vertex(x2, (dy > 0) ? y2-10 : y2+10);
-        // endShape();
-        // pop();
+        if (att === def) {
+          att.movetoPosition(circleCenterX, circleCenterY - 50);
+          push();
+          noStroke();
+          textAlign(CENTER);
+          fill(255, 150);
+          textSize(20);
+          text("Cival War", circleCenterX, circleCenterY + 50);
+          pop();
+        } else {
+          var x1 = att['x']+20+12*att.getIsGreat();
+          var y1 = att['y'];
+          var x2 = def['x']-20-12*def.getIsGreat();
+          var y2 = def['y'];
+          var dx = x2 - x1;
+          var dy = y2 - y1;
+          bezier(x1, y1
+                , x1 + dx/10, y1 + dy/3
+                , x1 + dx/3*2, y1 + dy/10*9
+                , x2, y2);
+
+          // TODO: arrow
+          // push();
+          // fill(255);
+          // beginShape();
+          // // console.log((dx > 0) ? x2-10 : x2+10, y2
+          // //             , x2, y2
+          // //           , );
+          // vertex((dx > 0) ? x2-10 : x2+10, y2);
+          // vertex(x2, y2)
+          // vertex(x2, (dy > 0) ? y2-10 : y2+10);
+          // endShape();
+          // pop();
+        }
       }
     }
   }
@@ -277,7 +342,7 @@ function drawAttDefInfo(leftC, rightC, top, width) {
 
   // left box
   push();
-  stroke(attColor);
+  stroke(255, 200);
   strokeWeight(0.5);
   textAlign(CENTER, TOP);
   textSize(20);
@@ -298,7 +363,7 @@ function drawAttDefInfo(leftC, rightC, top, width) {
     textAlign(CENTER, TOP);
     textSize(10);
     // stroke(253, 201, 68);
-    fill(253, 201, 68);
+    fill(attColor);
     text(attKing, left+width/2, top+imageWidth+35);
     pop();
     fill(255, 200);
@@ -333,7 +398,7 @@ function drawAttDefInfo(leftC, rightC, top, width) {
 
   // right box
   push();
-  stroke(defColor);
+  stroke(255, 200);
   strokeWeight(0.5);
   textAlign(CENTER, TOP);
   textSize(20);
@@ -352,7 +417,7 @@ function drawAttDefInfo(leftC, rightC, top, width) {
     push();
     textAlign(CENTER, TOP);
     textSize(10);
-    fill(253, 201, 68);
+    fill(defColor);
     text(defKing, right+width/2, top+imageWidth+35);
     pop();
     if (defCom[0] != "") {
@@ -394,99 +459,3 @@ function drawAttDefInfo(leftC, rightC, top, width) {
   text("WIN", 0, 0);
   pop();
 }
-
-// function drawBox(box) {
-//   fill(255, 20);
-//   strokeWeight(.7);
-//   stroke(255, 50);
-//   rect(box.left, box.top, box.width, box.height);
-//   textAlign(CENTER, TOP);
-//   fill(255);
-//   noStroke();
-//
-//   // if the box is not clickable: always display info
-//   if (!box.clickable) {
-//     if (box.title == "Battle Type") {
-//       push();
-//       textFont(font28);
-//       textSize(15);
-//       textAlign(LEFT, CENTER);
-//       var info = "This is a " + data.getColumn(box.feature[0])[time];
-//       text(info, box.left + 23, box.top + box.height/2);
-//       pop();
-//     } else if (box.title == "Attackers vs Defenders") {
-//       drawAttDefInfo(box);
-//     } else if (box.title == "size") {
-//       drawSizeInfo(box);
-//     }
-//   } else {
-//     // if clickable: display title
-//     text(box.title, box.left + box.width / 2, box.top + 5);
-//     // if the box is open: display details
-//     if (box.open && box.feature) {
-//       textAlign(LEFT, TOP);
-//       // console.log(data.getColumn(box.feature));
-//       var info = "";
-//       if (box.feature[0] == "house") {
-//         houseList.forEach(function(house) {
-//           if (house.involved) info += house.name + ": " + house.involved + "\n";
-//         });
-//       } else {
-//         for (var i = 0; i < box.feature.length; i++) {
-//           info += data.getColumn(box.feature[i])[time] + "\n";
-//         }
-//       }
-//       text(info, box.left+5, box.top+30);
-//     }
-//   }
-//   // hover: display details
-//   // if (isInsideBox(box)) {
-//   //   drawHoverBox(box.title, box.width, box.height, mouseX, mouseY);
-//   // }
-// }
-//
-// function drawTitle() {
-//   push();
-//   textAlign(LEFT, CENTER);
-//   textSize(20);
-//   fill(255);
-//   textFont(fontGOT);
-//   text("GAME  OF  THRONES  BATTLES", titleX, titleY);
-//   pop();
-// }
-//
-// function drawText(x, y) {
-//   textAlign(LEFT, TOP);
-//   fill(255, 150);
-//   textSize(12);
-//   text("Untorem dolut que et ratiant isimaio nsecab\n" +
-//         "ceptu restia conet ab im fugitis ut auta s\n" +
-//         "renda dolum quia ventia provid mo- luptati\n" +
-//         "odici endestior mo et pero blabori o ctis \n" +
-//         "eum audae imoloris con restia delicid\n" +
-//         "ceptu restia conet ab im fugitis ut auta s\n" +
-//         "renda dolum quia ventia provid mo- luptati\n" +
-//         "odici endestior mo et pero blabori o ctis \n" +
-//         "eum audae imoloris con restia delicid\n" +
-//         "quam as dolendi berum nihitatum"
-//     , x, y);
-// }
-//
-//
-// function drawRightSec(x, y, w, h) {
-//   // draw a info board
-//   push();
-//   fill(0, 50);
-//   stroke(255, 100);
-//   strokeWeight(0.5);
-//   rect(x, y, w, h);
-//   pop();
-//
-//   // draw board title
-//   push();
-//   textAlign(CENTER, TOP);
-//   textFont(font28);
-//   textSize(30);
-//   text("INFORMATION", x+w/2, y+h/30);
-//   pop();
-// }

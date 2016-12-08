@@ -3,6 +3,9 @@
 // built-in mouseMoved event controler
 function mouseMoved() {
     timeMouseOver = mouseInSlider();
+    // houseList.forEach(function(house) {
+    //   if (house.isMouseOver()) console.log(house.name);
+    // });
 }
 
 // built-in mouseDragged event controler
@@ -14,8 +17,15 @@ function mouseDragged() {
   }
 }
 
+function keyPressed() {
+  if (start) start = false;
+}
+
 // built-in mousePressed event controler
 function mousePressed() {
+  if (start
+    && !isInsideBox({left: width*0.3, top: height*0.35, right: width*0.7, bottom: height*0.65})
+  ) start = false;
   boxList.forEach(function(box) {
     clickBox(box);
   });
@@ -94,3 +104,11 @@ function isInsideBox(box) {
       && mouseY >= box.top
       && mouseY <= box.bottom;
 }
+
+// return true if mouse is inside the box
+// function isMouseInside(left, right, top, bottom) {
+//   return mouseX >= left
+//       && mouseX <= right
+//       && mouseY >= top
+//       && mouseY <= bottom;
+// }

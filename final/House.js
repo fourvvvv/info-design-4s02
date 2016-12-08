@@ -33,13 +33,6 @@ House.prototype.getIsGreat = function() {
   return this.isGreat;
 }
 
-// House.prototype.getBox = function(width){
-//   this.left = this.x - width;
-//   this.right = this.x + width;
-//   this.top = this.y - width;
-//   this.bottom = this.y + width;
-// }
-
 House.prototype.movetoPosition = function(x, y){
   this.targetX = x;
   this.targetY = y;
@@ -55,4 +48,12 @@ House.prototype.updatePostion = function(){
 
   dy = this.targetY - this.y;
   this.y += dy * easing;
+}
+
+House.prototype.isMouseOver = function () {
+  return mouseX >= this.x - 20 - this.isGreat * 20
+      && mouseX <= this.x + 20 + this.isGreat * 20
+      && mouseY >= this.y - 20 - this.isGreat * 20
+      && mouseY <= this.y + 20 + this.isGreat * 20
+      ;
 }

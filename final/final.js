@@ -1,15 +1,11 @@
 /*****
 TODO:
 3) (maybe not) Bolton betrayed
-6) change stupid drawing box -> put them into an array?
 7) (maybe not)  major_death & major_capture
-8) (maybe not) move house icons all the time
-  - Distance bewteen each other could be based on relationship (distant / close)
+8) (maybe not) Distance bewteen each other could be based on relationship (distant / close)
 13) (maybe not)  whether use "currentInBattle"
 14) (maybe not) change houses to be not hard coding in "data.js"
-19) change font - number
-20) att vs def - 2 sides along the battle field
-
+22) ARROW!!!!!!
 
 DONE
 1) arrow - bezier() & line
@@ -19,6 +15,7 @@ DONE
   - houses' #battle -> color
 4) crawler: get icon image for each house
 5) time slider not equally divided
+6) change stupid drawing box -> put them into an array?
 8) move house icons all the time
   - at first, all Greater houses are shown in a row
   - move who's involved to the screen center, and move others to corner (and opacity)
@@ -37,6 +34,10 @@ DONE
   - sheild mask
 17) time - display year and current time
 18) att vs def
+19) change font - number
+20) att vs def - 2 sides along the battle field
+21) hover to show more info
+23) first start
 
 *****/
 
@@ -55,14 +56,14 @@ var circleCenterX, circleCenterY, circleR
 var boxList = [];
 var houseList = [];
 var time = 0;
-var pTime = time;
+var pTime = -1;
 
 var matrix = [];
 var animating = false;
 var TimeBarXs;
 var sliderSize;
 var timeMouseOver = 0;
-var speed = 20;
+var speed = 40;
 var years;
 var yearIndex = {};
 var kingsImg;
@@ -118,60 +119,52 @@ function setup() {
   circleR = height*0.3;
 
 
-  shieldWidth = width*0.25;
+  shieldWidth = width*0.23;
   shieldLeft = (width - shieldWidth)/2;
 
   TimeBarXs = preProcessTimeBar();
-
-  // boxLeft = width*0.77;
-  // boxTop = height*0.15;
-  // boxList.push(new Box("Battle Type"
-  //             , width*0.2, height*0.04, boxLeft, boxTop+height*0.07
-  //             , ["battle_type"]
-  //             , -1));
-  // boxList.push(new Box("Attackers vs Defenders"
-  //             , width*0.2, height*0.36, boxLeft, boxTop+height*0.12
-  //             , ["attacker_king", "defender_king"
-  //               ,	"attacker_1",	"attacker_2",	"attacker_3",	"attacker_4"
-  //               ,	"defender_1",	"defender_2",	"defender_3",	"defender_4"]
-  //             , -1));
-  // boxList.push(new Box("size"
-  //             , width*0.2, height*0.05, boxLeft, boxTop+height*(0.12+0.36+0.01)
-  //             , ["attacker_size", "defender_size"]
-  //             , -1));
 
   // setup Greater Houses' positions
   initHousePosition();
   moveHousePositionToInit();
 }
+
+start = true;
+
 function draw() {
-  if (pTime !== time) {
-    // move once
-    moveToBattlefield();
-    fillCurrentInBattle(time);
-    pTime = time;
-  }
-
-  // keep tracking updating
-  updateHousePosition();
-  moveTimeCursor();
-
   // draw background
   background(bg);
-  drawBgOpacity(100);
 
-  drawBattleField(shieldLeft, height*0.2, shieldWidth, height*0.6);
+  if (start) {
+    drawStartIntro(width*0.3, height*0.35, width*0.4, height*0.3);
+  } else {
+    if (pTime !== time) {
+      // move once
+      moveToBattlefield();
+      fillCurrentInBattle(time);
+      pTime = time;
+    }
 
-  // draw time slider
-  drawTimeSlider();
+    // keep tracking updating
+    updateHousePosition();
+    moveTimeCursor();
 
-  // draw circle
-  if (data.getRowCount()) drawCircle(time);
+    drawBgOpacity(100);
 
-  drawBattleBar(shieldLeft, height*0.1, shieldWidth, height*0.03);
-  drawAttDefInfo(shieldLeft - width*0.08, shieldLeft + shieldWidth + width*0.08, height*0.2, height*0.11);
-  // fill involoved
-  if (data.getRowCount()) fillInvoloved(time);
+    drawBattleField(shieldLeft, height*0.2, shieldWidth, height*0.6);
+
+    // draw time slider
+    drawTimeSlider();
+
+    // draw circle
+    if (data.getRowCount()) drawCircle(time);
+
+    drawBattleBar(shieldLeft, height*0.1, shieldWidth, height*0.03);
+    drawAttDefInfo(shieldLeft - width*0.08, shieldLeft + shieldWidth + width*0.08, height*0.2, height*0.11);
+    // fill involoved
+    if (data.getRowCount()) fillInvoloved(time);
+  }
+
   // draw boxes
   // boxList.forEach(function(box) {
   //   drawBox(box);
