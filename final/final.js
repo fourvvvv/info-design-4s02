@@ -5,7 +5,6 @@ TODO:
 8) (maybe not) Distance bewteen each other could be based on relationship (distant / close)
 13) (maybe not)  whether use "currentInBattle"
 14) (maybe not) change houses to be not hard coding in "data.js"
-22) ARROW!!!!!!
 
 DONE
 1) arrow - bezier() & line
@@ -37,6 +36,7 @@ DONE
 19) change font - number
 20) att vs def - 2 sides along the battle field
 21) hover to show more info
+22) ARROW!!!!!!
 23) first start
 
 *****/
@@ -63,7 +63,7 @@ var animating = false;
 var TimeBarXs;
 var sliderSize;
 var timeMouseOver = 0;
-var speed = 40;
+var speed = 70;
 var years;
 var yearIndex = {};
 var kingsImg;

@@ -19,6 +19,8 @@ function mouseDragged() {
 
 function keyPressed() {
   if (start) start = false;
+  if (keyCode === LEFT_ARROW && time > 0) time--;
+  if (keyCode === RIGHT_ARROW && time < TimeBarXs.length - 1) time++
 }
 
 // built-in mousePressed event controler
@@ -26,10 +28,13 @@ function mousePressed() {
   if (start
     && !isInsideBox({left: width*0.3, top: height*0.35, right: width*0.7, bottom: height*0.65})
   ) start = false;
-  boxList.forEach(function(box) {
-    clickBox(box);
-  });
+
+  // boxList.forEach(function(box) {
+  //   clickBox(box);
+  // });
+
   if (mouseInSlider() !== -1 && mouseInSlider() !== time) {
+    animating = false;
     time = mouseInSlider();
     changing = 1;
   }

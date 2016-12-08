@@ -46,8 +46,8 @@ function drawStartIntro(x, y, w, h) {
 }
 
 // called by "drawBox"
-function drawHoverBox(content, x, y) {
-  this.myWidth = 220;
+function drawHoverBox(content, x, y, w) {
+  this.myWidth = w || 220;
   this.myHeight = 20;
   this.x = x + this.myWidth/2;
   this.y = y + this.myHeight/2;
@@ -315,12 +315,12 @@ function drawCircle(index) {
           var dx = x2 - x1;
           var dy = y2 - y1;
           bezier(x1, y1
-                , x1 + dx/10, y1 + dy/3
-                , x1 + dx/3*2, y1 + dy/10*9
+                , x1 + dx/8, y1 + dy/3
+                , x1 + dx/3*2, y1 + dy/8*6
                 , x2, y2);
 
-          // TODO: arrow
-          drawArrow(x2, y2, 3, 90);
+          // draw arrow
+          drawArrow(x2, y2, 3, 90 * pow(-1, dx < 0));
         }
       }
     }
@@ -371,6 +371,12 @@ function drawAttDefInfo(leftC, rightC, top, width) {
     pop();
     fill(255, 200);
     if (attCom[0] != "") {
+      var comBox = {left: left
+                  , top: top+imageWidth+35
+                  , right: left+width
+                  , bottom: top+imageWidth+50+attCom.length*15
+                };
+      if (isInsideBox(comBox)) drawHoverBox("Commanders in attacker teams", mouseX, mouseY, 180);
       push();
       textFont(fontFrankGotRom);
       textAlign(CENTER, TOP);
@@ -424,6 +430,12 @@ function drawAttDefInfo(leftC, rightC, top, width) {
     text(defKing, right+width/2, top+imageWidth+35);
     pop();
     if (defCom[0] != "") {
+      var comBox = {left: right
+                  , top: top+imageWidth+35
+                  , right: right+width
+                  , bottom: top+imageWidth+50+attCom.length*15
+                };
+      if (isInsideBox(comBox)) drawHoverBox("Commanders in defender teams", mouseX, mouseY, 180);
       push();
       textFont(fontFrankGotRom);
       textAlign(CENTER, TOP);
