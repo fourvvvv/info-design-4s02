@@ -1,16 +1,29 @@
 // This file contains all functions drawing components
+function drawArrow(cx, cy, w, angle){
+  push();
+  fill(255);
+  translate(cx, cy);
+  rotate(radians(angle));
+  beginShape();
+  vertex(-w, w*sqrt(3));
+  vertex(0, 0);
+  vertex(w, w*sqrt(3));
+  endShape();
+  pop();
+}
 
 function drawStartIntro(x, y, w, h) {
   push();
-  textSize(50);
+  stroke(0, 150);
   fill(255, 200);
   textAlign(CENTER, CENTER);
   textFont(fontGOT);
+  textSize(50);
   text("#   Battles", width/2, height*0.25);
   pop();
   push();
   strokeWeight(2);
-  stroke(0, 200);
+  stroke(0, 100);
   fill(255, 200);
   rect(x, y, w, h);
   // intro
@@ -307,17 +320,7 @@ function drawCircle(index) {
                 , x2, y2);
 
           // TODO: arrow
-          // push();
-          // fill(255);
-          // beginShape();
-          // // console.log((dx > 0) ? x2-10 : x2+10, y2
-          // //             , x2, y2
-          // //           , );
-          // vertex((dx > 0) ? x2-10 : x2+10, y2);
-          // vertex(x2, y2)
-          // vertex(x2, (dy > 0) ? y2-10 : y2+10);
-          // endShape();
-          // pop();
+          drawArrow(x2, y2, 3, 90);
         }
       }
     }
