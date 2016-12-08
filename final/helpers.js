@@ -52,13 +52,24 @@ function preProcessTimeBar() {
 function initHousePosition() {
   houseList.forEach(function(entry, i){
     if (entry.getIsGreat()) {
+      if (i % 2) {
+        x = circleCenterX - width*0.35;
+        y = height*0.12 + height*0.8/5 * i / 2;
+      } else {
+        x = circleCenterX + width*0.35;
+        y = height*0.12 + height*0.8/5 * i / 2;
+      }
       // entry.setPositon(width / 2 + (i - 4) * width/10, height / 2);
-      entry.setPositon(circleCenterX + circleR * sin(TAU / 9 * i)
-        , circleCenterY + circleR * cos(TAU / 9 * i));
     } else {
-      entry.setPositon(circleCenterX + circleR*1.5 * sin(TAU / (24 - 9) * i)
-        , circleCenterY + circleR*1.4 * cos(TAU / (24 - 9) * i));
+      if (i % 2) {
+        x = circleCenterX - width*0.4;
+        y = height*0.15 + height*0.75/8 * (i-9) / 2;
+      } else {
+        x = circleCenterX + width*0.4;
+        y = height*0.15 + height*0.75/8 * (i-9) / 2;
+      }
     }
+    entry.setPositon(x, y);
   });
 }
 
@@ -69,30 +80,53 @@ function updateHousePosition() {
 }
 
 function moveHousePositionToInit() {
+  var x, y;
   houseList.forEach(function(entry, i){
     if (entry.getIsGreat()) {
+      if (i % 2) {
+        x = circleCenterX - width*0.35;
+        y = height*0.15 + height*0.8/5 * i / 2;
+      } else {
+        x = circleCenterX + width*0.35;
+        y = height*0.15 + height*0.8/5 * i / 2;
+      }
       // entry.setPositon(width / 2 + (i - 4) * width/10, height / 2);
-      entry.movetoPosition(circleCenterX + circleR * sin(TAU / 9 * i)
-        , circleCenterY + circleR * cos(TAU / 9 * i));
     } else {
-      entry.movetoPosition(circleCenterX + circleR*1.5 * sin(TAU / (24 - 9) * i)
-        , circleCenterY + circleR*1.4 * cos(TAU / (24 - 9) * i));
+      if (i % 2) {
+        x = circleCenterX - width*0.4;
+        y = height*0.2 + height*0.8/8 * (i-9) / 2;
+      } else {
+        x = circleCenterX + width*0.4;
+        y = height*0.2 + height*0.8/8 * (i-9) / 2;
+      }
+      // entry.movetoPosition(circleCenterX + circleR*1.5 * sin(TAU / (24 - 9) * i)
+      //   , circleCenterY + circleR*1.4 * cos(TAU / (24 - 9) * i));
     }
+    entry.movetoPosition(x, y);
   });
 }
 
 function moveToBattlefield() {
   moveHousePositionToInit();
+  var left = circleCenterX - shieldWidth/8*3 + 20;
+  var right = circleCenterX + shieldWidth/8*3 - 20;
+  var top = height*0.2;
+  var myHeight = height*0.6;
 
-  this.myHeight = height*0.8;
   var housesInBattle = getHousesInBattle(time);
   var attackers = housesInBattle["attackers"];
   var defenders = housesInBattle["defenders"];
 
   attackers.forEach(function(name, i) {
     var att = findItemByValue(houseList, "name", name);
-    att.movetoPosition(circleCenterX + circleR/5 * sin(TAU / attackers.length * i)
-        , circleCenterY + circleR/5 * cos(TAU / attackers.length * i));
+    // att.movetoPosition(circleCenterX + circleR/5 * sin(TAU / attackers.length * i)
+    //     , circleCenterY + circleR/5 * cos(TAU / attackers.length * i));
+    att.movetoPosition(left + (i%2) * shieldWidth/8 , top + myHeight / (attackers.length + 1) * (i+1) - 20);
+  });
+
+  defenders.forEach(function(name, i) {
+    var def = findItemByValue(houseList, "name", name);
+    def.movetoPosition(right - (i%2) * shieldWidth/8, top + myHeight / (defenders.length + 1) * (i+1) - 20);
   });
 }
 
@@ -225,4 +259,16 @@ function myPrintMatrix(a) {
     }
     console.log(row);
   }
+}
+
+function HEXtoRGB(hex) {
+    var bigint = parseInt(hex.replace("#",""), 16);
+    var r = (bigint >> 16) & 255;
+    var g = (bigint >> 8) & 255;
+    var b = bigint & 255;
+    return {
+      "r": r,
+      "g": g,
+      "b": b
+    };
 }

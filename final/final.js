@@ -1,16 +1,15 @@
 /*****
 TODO:
-3) Bolton betrayed
+3) (maybe not) Bolton betrayed
 6) change stupid drawing box -> put them into an array?
 7) (maybe not)  major_death & major_capture
 8) (maybe not) move house icons all the time
   - Distance bewteen each other could be based on relationship (distant / close)
-10) image
-  - size correctly
 13) (maybe not)  whether use "currentInBattle"
 14) (maybe not) change houses to be not hard coding in "data.js"
-16) formatting
-  - sheild mask
+19) change font - number
+20) att vs def - 2 sides along the battle field
+
 
 DONE
 1) arrow - bezier() & line
@@ -27,6 +26,7 @@ DONE
 9) hover box to explain info
 10) image
   - get rid of errors -> found images for all houses
+  - size correctly
 11) format text size/align
 12) change to Class
 15) animation
@@ -34,6 +34,7 @@ DONE
   - not show all labels
   - team together
   - non-battle ones stepback/smaller -> transparency
+  - sheild mask
 17) time - display year and current time
 18) att vs def
 
@@ -50,7 +51,7 @@ var slider;
 var data;
 var img = [];
 var circleCenterX, circleCenterY, circleR
-  , titleX, titleY;
+  , titleX, titleY, shieldLeft, shieldWidth;
 var boxList = [];
 var houseList = [];
 var time = 0;
@@ -66,13 +67,16 @@ var years;
 var yearIndex = {};
 var kingsImg;
 var boxLeft, boxTop;
-
+var fontTrajaReg, fontFrankGotRom;
 function preload() {
   data = loadTable("data/battles.csv", "csv", "header");
   font28 = loadFont('fonts/28DaysLater.ttf');
   fontGOT = loadFont('fonts/GameOfThrones.ttf');
   fontTrueLies = loadFont('fonts/TrueLies.ttf');
+  fontFrankGotRom = loadFont('fonts/FRABK.TTF');
+  fontTrajaReg = loadFont('fonts/Trajan-Regular.ttf');
   bg = loadImage("img/bg.jpg");
+
   // put all House instance into houseList
   var counter = 0;
   for (var key in houses) {
@@ -96,72 +100,49 @@ function preload() {
 
 function setup() {
   createCanvas(displayWidth, windowHeight);
-
+  textFont(fontTrajaReg);
   // build a [m x n] matrix of relations, m = n = #houses
   // cell (x, y) = {enemy: #times houseX and houseY were against each other
   //              , ally: #times houseX and houseY were at the same side}
-  initMatrix();
+  // initMatrix();
 
-  years = data.getColumn("year");
-  kingsImg = preProcessKings();
+  initYears();
 
-  for (var i = 0; i < years.length; i++) {
-    if (yearIndex[years[i]]) {
-      yearIndex[years[i]]++;
-    } else {
-      if (i === 0) {
-        yearIndex[years[i]] = 1;
-      } else {
-        yearIndex[years[i]] = parseInt(yearIndex[years[i - 1]]) + 1;
-      }
-    }
-  }
   // init variables about sizes
-  sliderSize = {width: width*0.28
-          , left: width*0.03
-          , top: height*0.8
-          , play: {
-              width: 20
-            }
-          };
-  sliderSize.right = sliderSize.left + sliderSize.width;
-  sliderSize.bottom = sliderSize.top + sliderSize.play.width*2;
-  sliderSize.play.centerX = sliderSize.left - sliderSize.play.width;
-  sliderSize.play.centerY = (sliderSize.top + sliderSize.bottom)/2;
-  // sliderSize.play.centerY = sliderSize.top;
-  sliderSize.play.left = sliderSize.play.centerX - sliderSize.play.width;
-  sliderSize.play.right = sliderSize.play.centerX + sliderSize.play.width;
-  sliderSize.play.top = sliderSize.play.centerY - sliderSize.play.width;
-  sliderSize.play.bottom = sliderSize.play.centerY + sliderSize.play.width;
+  initSlider(width*0.5, width*0.25, height*0.9, 20);
 
   titleX = width*0.02;
   titleY = height*0.2;
-
-  TimeBarXs = preProcessTimeBar();
-
-  boxLeft = width*0.77;
-  boxTop = height*0.15;
-  boxList.push(new Box("Battle Type"
-              , width*0.2, height*0.04, boxLeft, boxTop+height*0.07
-              , ["battle_type"]
-              , -1));
-  boxList.push(new Box("Attackers vs Defenders"
-              , width*0.2, height*0.36, boxLeft, boxTop+height*0.12
-              , ["attacker_king", "defender_king"
-                ,	"attacker_1",	"attacker_2",	"attacker_3",	"attacker_4"
-                ,	"defender_1",	"defender_2",	"defender_3",	"defender_4"]
-              , -1));
-  boxList.push(new Box("size"
-              , width*0.2, height*0.05, boxLeft, boxTop+height*(0.12+0.36+0.01)
-              , ["attacker_size", "defender_size"]
-              , -1));
-
   circleCenterX = width*0.5;
   circleCenterY = height*0.5;
   circleR = height*0.3;
+
+
+  shieldWidth = width*0.25;
+  shieldLeft = (width - shieldWidth)/2;
+
+  TimeBarXs = preProcessTimeBar();
+
+  // boxLeft = width*0.77;
+  // boxTop = height*0.15;
+  // boxList.push(new Box("Battle Type"
+  //             , width*0.2, height*0.04, boxLeft, boxTop+height*0.07
+  //             , ["battle_type"]
+  //             , -1));
+  // boxList.push(new Box("Attackers vs Defenders"
+  //             , width*0.2, height*0.36, boxLeft, boxTop+height*0.12
+  //             , ["attacker_king", "defender_king"
+  //               ,	"attacker_1",	"attacker_2",	"attacker_3",	"attacker_4"
+  //               ,	"defender_1",	"defender_2",	"defender_3",	"defender_4"]
+  //             , -1));
+  // boxList.push(new Box("size"
+  //             , width*0.2, height*0.05, boxLeft, boxTop+height*(0.12+0.36+0.01)
+  //             , ["attacker_size", "defender_size"]
+  //             , -1));
+
   // setup Greater Houses' positions
   initHousePosition();
-
+  moveHousePositionToInit();
 }
 function draw() {
   if (pTime !== time) {
@@ -173,36 +154,33 @@ function draw() {
 
   // keep tracking updating
   updateHousePosition();
-
-  background(bg);
   moveTimeCursor();
-  // fill(238, 162, 173);
-  // rect(0, 0, width, height);
 
-  // fill(121, 129, 116);
-  // rect(width/2, 0, width/2, height);
+  // draw background
+  background(bg);
+  drawBgOpacity(100);
 
-  // draw title
-  drawText(titleX, titleY + height*0.05);
+  drawBattleField(shieldLeft, height*0.2, shieldWidth, height*0.6);
 
   // draw time slider
   drawTimeSlider();
 
-  // fill involoved
-  if (data.getRowCount()) fillInvoloved(time);
-
-  // draw info
-  // drawInfo(slider.value() - 1);
-
   // draw circle
   if (data.getRowCount()) drawCircle(time);
 
+  drawBattleBar(shieldLeft, height*0.1, shieldWidth, height*0.03);
+  drawAttDefInfo(shieldLeft - width*0.08, shieldLeft + shieldWidth + width*0.08, height*0.2, height*0.11);
+  // fill involoved
+  if (data.getRowCount()) fillInvoloved(time);
   // draw boxes
-  boxList.forEach(function(box) {
-    drawBox(box);
-  });
-  drawTitle();
-  drawRightSec(boxLeft, boxTop, width*0.2, height*0.55);
-
+  // boxList.forEach(function(box) {
+  //   drawBox(box);
+  // });
+  // drawRightSec(boxLeft, boxTop, width*0.2, height*0.55);
+  // draw title
+  // drawTitle();
+  // drawText(titleX, titleY + height*0.05);
+  // draw info
+  // drawInfo(slider.value() - 1);
 
 }

@@ -16,7 +16,7 @@ var houses = {
   "Mormont": {great: 0},
   "Karstark": {great: 0},
   "Darry": {great: 0},
-  "Brotherhood without Banners": {great: 0},
+  "Brotherhood": {great: 0},
   "Free folk": {great: 0},
   "Thenns": {great: 0},
   "Mallister": {great: 0},
