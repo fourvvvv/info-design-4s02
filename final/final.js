@@ -69,6 +69,7 @@ var yearIndex = {};
 var kingsImg;
 var boxLeft, boxTop;
 var fontTrajaReg, fontFrankGotRom;
+
 function preload() {
   data = loadTable("data/battles.csv", "csv", "header");
   font28 = loadFont('fonts/28DaysLater.ttf');
@@ -83,6 +84,7 @@ function preload() {
   for (var key in houses) {
     houses[key]["index"] = counter;
     houseList.push(new House(key, houses[key]["great"] == 1, 0, 0));
+    counter++;
   }
 
   // load house images
@@ -105,7 +107,7 @@ function setup() {
   // build a [m x n] matrix of relations, m = n = #houses
   // cell (x, y) = {enemy: #times houseX and houseY were against each other
   //              , ally: #times houseX and houseY were at the same side}
-  // initMatrix();
+  initMatrix();
 
   initYears();
 
@@ -129,7 +131,8 @@ function setup() {
   moveHousePositionToInit();
 }
 
-start = true;
+var start = true;
+var complicated = false;
 
 function draw() {
   // draw background
@@ -142,6 +145,7 @@ function draw() {
       // move once
       moveToBattlefield();
       fillCurrentInBattle(time);
+      updateMatrix();
       pTime = time;
     }
 
@@ -156,9 +160,35 @@ function draw() {
     // draw time slider
     drawTimeSlider();
 
+    if (complicated) {
+      push();
+      textSize(12);
+      textFont(fontFrankGotRom);
+      textAlign(CENTER);
+      fill(255, 200);
+      text("Press -SHIFT- to go back to the simple version", width/2, height*0.03);
+      fill(255, 100, 100, 100);
+      rect(width/2 - 70, height*0.04, 50, 15);
+      fill(255, 200);
+      text("Enemy", width/2 - 45, height*0.04+10);
+
+      fill(100, 255, 100, 100);
+      rect(width/2 + 20, height*0.04, 50, 15);
+      fill(255, 200);
+      text("Ally", width/2 + 45, height*0.04+10);
+      pop();
+      drawMatrix();
+    } else {
+      push();
+      textSize(12);
+      textFont(fontFrankGotRom);
+      textAlign(CENTER);
+      fill(255, 200);
+      text("Press -SHIFT- to see all relations (may go too complicated)", width/2, height*0.03);
+      pop();
+    }
     // draw circle
     if (data.getRowCount()) drawCircle(time);
-
     drawBattleBar(shieldLeft, height*0.1, shieldWidth, height*0.03);
     drawAttDefInfo(shieldLeft - width*0.08, shieldLeft + shieldWidth + width*0.08, height*0.2, height*0.11);
     // fill involoved

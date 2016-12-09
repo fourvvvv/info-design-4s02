@@ -474,3 +474,55 @@ function drawAttDefInfo(leftC, rightC, top, width) {
   text("WIN", 0, 0);
   pop();
 }
+
+function drawMatrix() {
+
+  // draw all houses
+  // draw line (and arrows)
+  for (var i = 0; i < matrix.length; i++) {
+    for (var j = 0; j < matrix[0].length; j++) {
+      var allyCount = matrix[i][j].ally;
+      var enemyCount = matrix[i][j].enemy;
+      var h1 = houseList[i];
+      var h2 = houseList[j];
+      push();
+      noFill();
+      var op = 30;
+      if (h1.isMouseOver() || h2.isMouseOver()) op = 200;
+      if (enemyCount) {
+        stroke(255, 100, 100, op);
+        strokeWeight(enemyCount);
+        var x1 = h1['x'];
+        var y1 = h1['y'];
+        var x2 = h2['x'];
+        var y2 = h2['y'];
+        var dx = x2 - x1;
+        var dy = y2 - y1;
+        bezier(x1, y1
+              , x1 + dx/8, y1 + dy/3
+              , x1 + dx/3*2, y1 + dy/8*6
+              , x2, y2);
+        // draw arrow
+        // drawArrow(x2, y2, 3, 90 * pow(-1, dx < 0));
+      }
+
+      if (allyCount) {
+        stroke(100, 255, 100, op);
+        strokeWeight(allyCount);
+        var x1 = h1['x']+20+12*h1.getIsGreat();
+        var y1 = h1['y'];
+        var x2 = h2['x']-20-12*h2.getIsGreat();
+        var y2 = h2['y'];
+        var dx = x2 - x1;
+        var dy = y2 - y1;
+        bezier(x1, y1
+              , x1 + dx/8, y1 + dy/3
+              , x1 + dx/3*2, y1 + dy/8*6
+              , x2, y2);
+        // draw arrow
+        // drawArrow(x2, y2, 3, 90 * pow(-1, dx < 0));
+      }
+      pop();
+    }
+  }
+}

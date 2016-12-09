@@ -145,28 +145,28 @@ function initMatrix() {
 // update "matrix"
 function updateMatrix() {
   initMatrix();
-
-  for (var t = 0; t <= time; t++) {
+  for (var t = 0; t < time; t++) {
     var housesInBattle = getHousesInBattle(t);
     var attackers = housesInBattle["attackers"];
     var defenders = housesInBattle["defenders"];
-
+console.log(attackers);
     // ally
     for (var i = 0; i < attackers.length; i++) {
       for (var j = i + 1; j < attackers.length; j++) {
         var h1 = houses[attackers[i]]["index"];
         var h2 = houses[attackers[j]]["index"];
+        console.log(h1, h2);
         matrix[h1][h2]["ally"] += 1;
       }
     }
 
-    for (var i = 0; i < defenders.length; i++) {
-      for (var j = i + 1; j < defenders.length; j++) {
-        var h1 = houses[defenders[i]]["index"];
-        var h2 = houses[defenders[j]]["index"];
-        matrix[h1][h2]["ally"] += 1;
-      }
-    }
+    // for (var i = 0; i < defenders.length; i++) {
+    //   for (var j = i + 1; j < defenders.length; j++) {
+    //     var h1 = houses[defenders[i]]["index"];
+    //     var h2 = houses[defenders[j]]["index"];
+    //     matrix[h1][h2]["ally"] += 1;
+    //   }
+    // }
 
     // enemy
     for (var i = 0; i < attackers.length; i++) {
